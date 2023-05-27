@@ -1019,6 +1019,10 @@ void CL_MapLoading( void ) {
 		CL_Disconnect( qtrue );
 		Q_strncpyz( cls.servername, "localhost", sizeof(cls.servername) );
 		cls.state = CA_CHALLENGING;		// so the connect screen is drawn
+		clc.gotInfo = qfalse;
+		clc.gotStatus = qfalse;
+		clc.udpdl = 0;
+		clc.httpdl[0] = 0;
 		cls.keyCatchers = 0;
 		SCR_UpdateScreen();
 		clc.connectTime = -RETRANSMIT_TIMEOUT;
@@ -1333,6 +1337,10 @@ void CL_Connect_f( void ) {
 	} else {
 		cls.state = CA_CONNECTING;
 	}
+	clc.gotInfo = qfalse;
+	clc.gotStatus = qfalse;
+	clc.udpdl = 0;
+	clc.httpdl[0] = 0;
 
 
 
@@ -1540,18 +1548,6 @@ void CL_Vid_Restart_f( void ) {
 		// send pure checksums
 		CL_SendPureChecksums();
 	}
-}
-
-/*
-=================
-CL_Fs_Restart_f
-
-Restart the filesystem
-=================
-*/
-
-void CL_FS_Restart_f( void ) {
-	FS_Restart( clc.checksumFeed ); //xD
 }
 
 /*
@@ -1894,6 +1890,9 @@ void CL_ContinueCurrentDownload(dldecision_t decision) {
 			Com_DPrintf("HTTP URL: %s\n", remotepath);
 
 			char *tmp_os_path = FS_BuildOSPath(Cvar_VariableString("fs_homepath"), clc.downloadTempName);
+
+			// Try to create the destination folder
+			FS_CreatePath(tmp_os_path);
 			
 			clc.httpHandle = NET_HTTP_StartDownload(remotepath, tmp_os_path, CL_EndHTTPDownload, CL_ProcessHTTPDownload, Q3_VERSION, va("jk2://%s", NET_AdrToString(clc.serverAddress)));
 		} else {
@@ -1976,7 +1975,12 @@ void CL_InitDownloads(void) {
 	clc.downloadIndex = 0;
 
 	if (cls.ignoreNextDownloadList) {
-	  cls.ignoreNextDownloadList = qfalse;
+		cls.ignoreNextDownloadList = qfalse;
+	} else if ( clc.demoplaying ) {
+		if (FS_ComparePaks( missingfiles, sizeof( missingfiles ), NULL, 0, qfalse ) ) {
+			Com_Printf( S_COLOR_YELLOW "WARNING: You are missing some files referenced by the demo:\n%s"
+				S_COLOR_YELLOW "It may fail to play back correctly\n", missingfiles );
+		}
 	} else if ( !mv_allowDownload->integer ) {
 		// autodownload is disabled on the client
 		// but it's possible that some referenced files on the server are missing
@@ -2037,20 +2041,31 @@ void CL_CheckForResend( void ) {
 	switch ( cls.state ) {
 	case CA_CONNECTING:
 		// requesting a challenge
-		clc.httpdl[0] = 0;
-		clc.httpdlvalid = qfalse;
-		clc.udpdl = -1;
 #ifdef MV_MFDOWNLOADS
 		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "jk2mfport");
 #endif
-		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getinfo"); // for mvhttp
-		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getstatus"); // for sv_allowdownload
+		if ( !clc.gotInfo ) NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getinfo"); // mvhttp + protocol detection
+		if ( !clc.gotStatus ) NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getstatus"); // version detection
 		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getchallenge");
 		break;
 
 	case CA_CHALLENGING:
-		if (MV_GetCurrentGameversion() == VERSION_UNDEF || ( ( !clc.httpdlvalid || clc.udpdl == -1 ) && com_dedicated->integer) )
-			break;
+		if ( MV_GetCurrentGameversion() == VERSION_UNDEF || !clc.gotInfo || (!clc.gotStatus && MV_GetCurrentProtocol() != PROTOCOL16) )
+		{ // We need to know the gameversion of the server and we need the infoResponse for mvhttp infos. In case we're dealing with PROTOCOL15 we also need the statusResponse for version 1.03 detection.
+			static int lastGetinfo;
+
+			if ( !clc.gotInfo )
+			{
+				lastGetinfo = clc.connectPacketCount;
+				NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getinfo"); // mvhttp + protocol detection
+			}
+			else if ( clc.connectPacketCount == 1 ) lastGetinfo = 1;
+			if ( !clc.gotStatus ) NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getstatus"); // version detection
+
+			// If we received an infoResponse, but no statusResponse retry 3 more times to get the status. If that doesn't work try to connect anyway. Maybe the server is unable to send a statusResponse...
+			if ( !(MV_GetCurrentGameversion() != VERSION_UNDEF && clc.gotInfo && clc.connectPacketCount - lastGetinfo > 3) )
+				break;
+		}
 
 		// sending back the challenge
 		port = (int) Cvar_VariableValue ("net_qport");
@@ -2729,12 +2744,9 @@ void CL_Frame ( int msec ) {
 
 	// if recording an avi, lock to a fixed fps
 	if ( CL_VideoRecording() && cl_aviFrameRate->integer && msec) {
-		// save the current screen
 		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) {
 			static double	overflow = 0.0;
 			double			frameTime;
-
-			CL_TakeVideoFrame();
 
 			frameTime = (1000.0 / abs(cl_aviFrameRate->integer)) * com_timescale->value;
 			frameTime += overflow;
@@ -2901,6 +2913,18 @@ void CL_InitRenderer( void ) {
 }
 
 /*
+============
+CL_UpdateGLConfig
+============
+*/
+void CL_UpdateRefConfig( void ) {
+	re.UpdateGLConfig( &cls.glconfig );
+
+	cls.xadjust = (float) SCREEN_WIDTH / cls.glconfig.vidWidth;
+	cls.yadjust = (float) SCREEN_HEIGHT / cls.glconfig.vidHeight;
+}
+
+/*
 ============================
 CL_StartHunkUsers
 
@@ -2981,6 +3005,7 @@ void CL_InitRef( void ) {
 	ri.Hunk_FreeTempMemory = Hunk_FreeTempMemory;
 	ri.CM_DrawDebugSurface = CM_DrawDebugSurface;
 	ri.FS_ReadFile = FS_ReadFile;
+	ri.FS_ReadFileSkipJKA = FS_ReadFileSkipJKA;
 	ri.FS_FreeFile = FS_FreeFile;
 	ri.FS_WriteFile = FS_WriteFile;
 	ri.FS_FreeFileList = FS_FreeFileList;
@@ -2996,8 +3021,6 @@ void CL_InitRef( void ) {
 	ri.CIN_UploadCinematic = CIN_UploadCinematic;
 	ri.CIN_PlayCinematic = CIN_PlayCinematic;
 	ri.CIN_RunCinematic = CIN_RunCinematic;
-
-	ri.CL_WriteAVIVideoFrame = CL_WriteAVIVideoFrame;
 
 	ri.CM_PointContents = CM_PointContents;
 
@@ -3168,7 +3191,6 @@ void CL_Init( void ) {
 	Cvar_Get ("password", "", CVAR_USERINFO);
 	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
 
-
 	// cgame might not be initialized before menu is used
 	Cvar_Get ("cg_viewsize", "100", CVAR_ARCHIVE );
 	
@@ -3203,7 +3225,6 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
 	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
 	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);
-	Cmd_AddCommand ("fs_restart", CL_FS_Restart_f);
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
 	Cmd_AddCommand ("vid_restart", CL_Vid_Restart_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
@@ -3479,7 +3500,9 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	}
 
 	// multiprotocol support
-	if (cls.state == CA_CONNECTING && NET_CompareAdr(from, clc.serverAddress)) {
+	if ((cls.state == CA_CONNECTING || cls.state == CA_CHALLENGING) && NET_CompareAdr(from, clc.serverAddress)) {
+		clc.gotInfo = qtrue;
+
 		if ( MV_GetCurrentGameversion() == VERSION_UNDEF )
 		{
 			switch ( prot )
@@ -3512,8 +3535,6 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 					clc.httpdl[len - 1] = 0;
 				}
 			}
-
-			clc.httpdlvalid = qtrue;
 		}
 
 		return;
@@ -3744,10 +3765,11 @@ void CL_ServerStatusResponse( netadr_t from, msg_t *msg ) {
 	}
 
 	// multiprotocol support
-	if (cls.state == CA_CONNECTING && NET_CompareAdr(from, clc.serverAddress))
+	if ((cls.state == CA_CONNECTING || cls.state == CA_CHALLENGING) && NET_CompareAdr(from, clc.serverAddress))
 	{
-		char *versionString;
-		versionString = Info_ValueForKey(s, "version");
+		char *versionString = Info_ValueForKey( s, "version" );
+
+		clc.gotStatus = qtrue;
 
 		// We used to seperate "1.02" and "1.04" by protocol "15" and "16". As "1.03" is using protocol "15", too we just look at the "version" to detect "1.03". If we don't find "1.03" we handle by protocol again.
 		if ( versionString && CL_ServerVersionIs103(versionString) )
@@ -3770,9 +3792,6 @@ void CL_ServerStatusResponse( netadr_t from, msg_t *msg ) {
 					break;
 			}
 		}
-
-		clc.udpdl = atoi(Info_ValueForKey(s, "sv_allowdownload"));
-
 		return;
 	}
 
@@ -4356,8 +4375,10 @@ void CL_GetVMGLConfig(vmglconfig_t *vmglconfig) {
 	vmglconfig->textureFilterAnisotropicAvailable = cls.glconfig.textureFilterAnisotropicMax == 0.0f ? qfalse : qtrue;
 	vmglconfig->clampToEdgeAvailable = cls.glconfig.clampToEdgeAvailable;
 
-	vmglconfig->vidWidth = cls.glconfig.vidWidth;
-	vmglconfig->vidHeight = cls.glconfig.vidHeight;
+	// pass window size instead of drawable size because original
+	// modules don't support changing vidWidth/vidHeight
+	vmglconfig->vidWidth = cls.glconfig.winWidth;
+	vmglconfig->vidHeight = cls.glconfig.winHeight;
 	vmglconfig->windowAspect = cls.glconfig.windowAspect;
 	vmglconfig->displayFrequency = cls.glconfig.displayFrequency;
 	vmglconfig->isFullscreen = cls.glconfig.isFullscreen;

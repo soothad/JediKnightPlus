@@ -13,9 +13,10 @@ cvar_t		*con_notifytime;
 cvar_t		*con_scale;
 cvar_t		*con_speed;
 cvar_t		*con_timestamps;
+cvar_t		*con_opacity;
+cvar_t		*con_skipNotifyKeyword;
 
 //EternalJK2MV
-cvar_t		*con_opacity;
 cvar_t		*con_notifywords;
 cvar_t		*con_notifyconnect;
 cvar_t		*con_notifyvote;
@@ -537,7 +538,7 @@ void Con_CheckResize (void)
 
 	assert(SMALLCHAR_HEIGHT >= SMALLCHAR_WIDTH);
 
-	scale = cls.glconfig.displayDPI / 96.0f *
+	scale = cls.glconfig.displayScale *
 		((con_scale->value > 0.0f) ? con_scale->value : 1.0f);
 	charWidth = scale * SMALLCHAR_WIDTH;
 
@@ -558,11 +559,11 @@ void Con_CheckResize (void)
 		Com_Error(ERR_FATAL, "Con_CheckResize: Window too small to draw a console");
 	}
 
-	rowwidth = width + 1 + CON_TIMESTAMP_LEN;
+	rowwidth = width + 1 + (con_timestamps->integer ? 0 : CON_TIMESTAMP_LEN);
 
 	con.charWidth = charWidth;
 	con.charHeight = scale * SMALLCHAR_HEIGHT;
-	con.linewidth = width - (con_timestamps->integer ? 0 : CON_TIMESTAMP_LEN);
+	con.linewidth = width;
 	kg.g_consoleField.widthInChars = width - 1; // Command prompt
 
 	if (con.rowwidth != rowwidth)
@@ -583,9 +584,10 @@ void Con_Init (void) {
 	con_speed = Cvar_Get ("con_speed", "3", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_scale = Cvar_Get ("con_scale", "1", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_timestamps = Cvar_Get ("con_timestamps", "1", CVAR_GLOBAL | CVAR_ARCHIVE);
+	con_opacity = Cvar_Get ("con_opacity", "1.0", CVAR_GLOBAL | CVAR_ARCHIVE);
+	con_skipNotifyKeyword = Cvar_Get ("con_skipNotifyKeyword", "[skipnotify]", CVAR_ARCHIVE); // NOT global, because it's made for compatibility with some mods
 
 	//EternalJK2MV
-	con_opacity = Cvar_Get("con_opacity", "1.0", CVAR_GLOBAL|CVAR_ARCHIVE);
 	con_notifywords = Cvar_Get("con_notifywords", "0", CVAR_ARCHIVE); // "Notifies you when defined words are mentioned"
 	con_notifyconnect = Cvar_Get("con_notifyconnect", "1", CVAR_ARCHIVE); // "Notifies you when someone connects to the server"
 	con_notifyvote = Cvar_Get("con_notifyvote", "1", CVAR_ARCHIVE); // "Notifies you when someone calls a vote"
@@ -657,19 +659,10 @@ Con_Linefeed
 ===============
 */
 int stampColor = COLOR_LT_TRANSPARENT;
-static void Con_Linefeed (qboolean skipnotify)
+void Con_Linefeed ( qboolean skipNotify )
 {
 	int		i;
 	int		line = (con.current % con.totallines) * con.rowwidth;
-
-	// mark time for transparent overlay
-	if (con.current >= 0)
-	{
-		if (skipnotify)
-			con.times[con.current & NUM_CON_TIMES] = 0;
-		else
-			con.times[con.current % NUM_CON_TIMES] = cls.realtime;
-	}
 
 	// print timestamp on the PREVIOUS line
 	{
@@ -685,6 +678,10 @@ static void Con_Linefeed (qboolean skipnotify)
 			con.text[line + i].f = { color, timestamp[i] };
 		}
 	}
+
+	// mark time for transparent overlay
+	if (con.current >= 0)
+		con.times[con.current % NUM_CON_TIMES] = skipNotify ? 0 : cls.realtime;
 
 	con.x = 0;
 
@@ -709,23 +706,23 @@ All console printing must go through this in order to be logged to disk
 If no console is visible, the text will appear at the top of the game window
 ================
 */
-void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
+void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNotify ) {
 	unsigned char	color;
 	char			c;
 	int				y;
-	qboolean		skipnotify = qfalse;
 	int				prev;
 
-	// for some demos we don't want to ever show anything on the console
-	if (cl_noprint && cl_noprint->integer) {
-		return;
+	if ( con_skipNotifyKeyword && con_skipNotifyKeyword->string && con_skipNotifyKeyword->string[0] ) {
+		int keywordLength = strlen( con_skipNotifyKeyword->string );
+		if ( !Q_strncmp(txt, con_skipNotifyKeyword->string, keywordLength) ) {
+			txt += keywordLength;
+			skipNotify = qtrue;
+		}
 	}
 
-	// TTimo - prefix for text that shows up in console but not in notify
-	// backported from RTCW
-	if (!Q_strncmp(txt, "[skipnotify]", 12)) {
-		skipnotify = qtrue;
-		txt += 12;
+	// for some demos we don't want to ever show anything on the console
+	if ( cl_noprint && cl_noprint->integer ) {
+		return;
 	}
 
 	if (!con.initialized) {
@@ -752,7 +749,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 		switch (c)
 		{
 		case '\n':
-			Con_Linefeed(skipnotify);
+			Con_Linefeed( skipNotify );
 			break;
 		case '\r':
 			con.x = 0;
@@ -762,7 +759,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 
 			if (con.x == con.rowwidth - CON_TIMESTAMP_LEN - 1) {
 				con.text[y * con.rowwidth + CON_TIMESTAMP_LEN + con.x] = CON_WRAP;
-				Con_Linefeed(skipnotify);
+				Con_Linefeed( skipNotify );
 				y = con.current % con.totallines;
 			}
 
@@ -775,7 +772,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 
 	if (con.display >= con.current)
 	{
-		if (skipnotify) {
+		if (skipNotify) {
 			prev = con.current % NUM_CON_TIMES - 1;
 			if (prev < 0)
 				prev = NUM_CON_TIMES - 1;
@@ -1025,17 +1022,9 @@ void Con_DrawSolidConsole( float frac ) {
 		y = 0;
 	}
 	else {
-		// draw the background at full opacity only if fullscreen
-		if (frac < 1.0f)
-		{
-			vec4_t con_color;
-			MAKERGBA(con_color, 1.0f, 1.0f, 1.0f, Com_Clamp(0.0f, 1.0f, con_opacity->value));
-			re.SetColor(con_color);
-		}
-		else
-		{
-			re.SetColor(NULL);
-		}
+		static vec4_t consoleShaderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		consoleShaderColor[3] = Com_Clamp( 0.0f, 1.0f, con_opacity->value );
+		re.SetColor( consoleShaderColor );
 		SCR_DrawPic( 0, 0, SCREEN_WIDTH, (float) y, cls.consoleShader );
 	}
 
@@ -1070,6 +1059,8 @@ void Con_DrawSolidConsole( float frac ) {
 		SCR_DrawSmallChar(cls.glconfig.vidWidth - (i - x) * con.charWidth, lines - (con.charHeight + con.charHeight / 2) + padding, ts[x]);
 	}
 
+	// draw the input prompt, user text, and cursor if desired
+	Con_DrawInput ();
 
 	// draw the text
 	con.vislines = lines;
@@ -1159,9 +1150,6 @@ void Con_DrawSolidConsole( float frac ) {
 			}
 		}
 	}
-
-	// draw the input prompt, user text, and cursor if desired
-	Con_DrawInput ();
 
 	re.SetColor( NULL );
 }

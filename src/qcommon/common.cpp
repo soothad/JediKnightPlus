@@ -52,7 +52,6 @@ cvar_t	*com_developer;
 cvar_t	*com_dedicated;
 cvar_t	*com_timescale;
 cvar_t	*com_fixedtime;
-cvar_t	*com_dropsim;		// 0.0 to 1.0, simulated packet drops
 cvar_t	*com_journal;
 cvar_t	*com_timedemo;
 cvar_t	*com_sv_running;
@@ -129,7 +128,7 @@ void Com_EndRedirect (void)
 	rd_flush = NULL;
 }
 
-static void Com_Puts_Ext( qboolean extendedColors, const char *msg )
+static void Com_Puts_Ext( qboolean extendedColors, qboolean skipNotify, const char *msg )
 {
 	const char *p = msg;
 
@@ -144,7 +143,7 @@ static void Com_Puts_Ext( qboolean extendedColors, const char *msg )
 
 	// echo to console if we're not a dedicated server
 	if ( com_dedicated && !com_dedicated->integer && !rd_silent ) {
-		CL_ConsolePrint( msg, extendedColors );
+		CL_ConsolePrint( msg, extendedColors, skipNotify );
 	}
 
 	while (*p) {
@@ -178,7 +177,7 @@ static void Com_Puts_Ext( qboolean extendedColors, const char *msg )
 
 		// logfile
 		if ( com_logfile && com_logfile->integer ) {
-			if ( !logfile ) {
+			if ( logfile == 0 ) {
 				struct tm *newtime;
 				time_t aclock;
 
@@ -186,14 +185,20 @@ static void Com_Puts_Ext( qboolean extendedColors, const char *msg )
 				newtime = localtime( &aclock );
 
 				logfile = FS_FOpenFileWrite( "qconsole.log" );
-				Com_Printf( "logfile opened on %s\n", asctime( newtime ) );
-				if ( com_logfile->integer > 1 ) {
-					// force it to not buffer so we get valid
-					// data even if we are crashing
-					FS_ForceFlush(logfile);
+				if ( logfile ) {
+					Com_Printf( "logfile opened on %s\n", asctime( newtime ) );
+
+					if ( com_logfile->integer > 1 ) {
+						// force it to not buffer so we get valid
+						// data even if we are crashing
+						FS_ForceFlush(logfile);
+					}
+				} else {
+					logfile = -1;
+					Com_Printf( "Couldn't open qconsole.log\n");
 				}
 			}
-			if ( logfile && FS_Initialized()) {
+			if ( logfile > 0 && FS_Initialized()) {
 				FS_Write(line, lineLen, logfile);
 			}
 		}
@@ -227,7 +232,7 @@ void QDECL Com_Printf( const char *fmt, ... )
 	Q_vsnprintf (msg,sizeof(msg),fmt,argptr);
 	va_end (argptr);
 
-	Com_Puts_Ext( qfalse, msg );
+	Com_Puts_Ext( qfalse, qfalse, msg );
 }
 
 void QDECL Com_Printf_Ext( qboolean extendedColors, const char *fmt, ... )
@@ -239,7 +244,19 @@ void QDECL Com_Printf_Ext( qboolean extendedColors, const char *fmt, ... )
 	Q_vsnprintf (msg,sizeof(msg),fmt,argptr);
 	va_end (argptr);
 
-	Com_Puts_Ext( extendedColors, msg);
+	Com_Puts_Ext( extendedColors, qfalse, msg);
+}
+
+void QDECL Com_Printf_MV( int flags, const char *fmt, ... )
+{
+	va_list		argptr;
+	char		msg[MAXPRINTMSG];
+
+	va_start (argptr,fmt);
+	Q_vsnprintf (msg,sizeof(msg),fmt,argptr);
+	va_end (argptr);
+
+	Com_Puts_Ext( qfalse, (qboolean)(flags & MVPRINT_SKIPNOTIFY), msg );
 }
 
 
@@ -262,7 +279,7 @@ void QDECL Com_DPrintf( const char *fmt, ...) {
 	Q_vsnprintf (msg,sizeof(msg),fmt,argptr);
 	va_end (argptr);
 
-	Com_Puts_Ext (qfalse, msg);
+	Com_Puts_Ext (qfalse, qfalse, msg);
 }
 
 // Outputs to the VC / Windows Debug window (only in debug compile)
@@ -384,7 +401,7 @@ void Com_Quit_f( void ) {
 		CL_Shutdown ();
 		VM_Forced_Unload_Done();
 		Com_Shutdown ();
-		FS_Shutdown(qtrue);
+		FS_Shutdown(qtrue, qfalse);
 	}
 	Sys_Quit ();
 }
@@ -403,7 +420,7 @@ Q_NORETURN void Com_Quit( int signal ) {
 	CL_Shutdown ();
 	VM_Forced_Unload_Done();
 	Com_Shutdown ();
-	FS_Shutdown(qtrue);
+	FS_Shutdown(qtrue, qfalse);
 	Sys_Quit ();
 }
 
@@ -1351,10 +1368,13 @@ const char *CopyString( const char *in ) {
 	return out;
 }
 
+const char *CopyString( const char *in, memtag_t eTag ) {
+	char	*out;
 
-
-
-
+	out = (char *)Z_Malloc(strlen(in) + 1, eTag);
+	strcpy(out, in);
+	return out;
+}
 
 
 /*
@@ -1515,10 +1535,10 @@ void Com_Meminfo_f( void ) {
 	Com_Printf( "%8i unused highwater\n", unused );
 	Com_Printf( "\n" );
 //	Com_Printf( "%8i bytes in %i zone blocks\n", zoneBytes, zoneBlocks	);
-	Com_Printf( "		%8i bytes in dynamic botlib\n", botlibBytes );
-	Com_Printf( "		%8i bytes in dynamic renderer\n", rendererBytes );
-//	Com_Printf( "		%8i bytes in dynamic other\n", zoneBytes - ( botlibBytes + rendererBytes ) );
-//	Com_Printf( "		%8i bytes in small Zone memory\n", smallZoneBytes );
+	Com_Printf( "%8i bytes in dynamic botlib\n", botlibBytes );
+	Com_Printf( "%8i bytes in dynamic renderer\n", rendererBytes );
+//	Com_Printf( "%8i bytes in dynamic other\n", zoneBytes - ( botlibBytes + rendererBytes ) );
+//	Com_Printf( "%8i bytes in small Zone memory\n", smallZoneBytes );
 }
 
 /*
@@ -1595,7 +1615,7 @@ void Hunk_Log( void) {
 	char		buf[4096];
 	int size, numBlocks;
 
-	if (!logfile || !FS_Initialized())
+	if (logfile <= 0 || !FS_Initialized())
 		return;
 	size = 0;
 	numBlocks = 0;
@@ -1625,7 +1645,7 @@ void Hunk_SmallLog( void) {
 	char		buf[4096];
 	int size, locsize, numBlocks;
 
-	if (!logfile || !FS_Initialized())
+	if (logfile <= 0 || !FS_Initialized())
 		return;
 	for (block = hunkblocks ; block; block = block->next) {
 		block->printed = qfalse;
@@ -2445,6 +2465,7 @@ void Com_Init( char *commandLine ) {
 	// bk001129 - do this before anything else decides to push events
 	Com_InitPushEvent();
 
+	Com_InitZoneMemory();
 	Cvar_Init ();
 
 	// prepare enough of the subsystems to handle
@@ -2454,7 +2475,6 @@ void Com_Init( char *commandLine ) {
 //	Swap_Init ();
 	Cbuf_Init ();
 
-	Com_InitZoneMemory();
 	Cmd_Init ();
 
 	// override anything from the config files with command line args
@@ -2466,6 +2486,9 @@ void Com_Init( char *commandLine ) {
 	// done early so bind command exists
 	CL_InitKeyCommands();
 
+	// before FS_InitFilesystem() so that ip_socket
+	// fd is lower than 1024 when there is a lot of pk3 files
+	NET_Init();
 	FS_InitFilesystem ();
 
 	Com_InitJournaling();
@@ -2515,7 +2538,6 @@ void Com_Init( char *commandLine ) {
 	com_timescale = Cvar_Get ("timescale", "1", CVAR_CHEAT | CVAR_SYSTEMINFO );
 	com_fixedtime = Cvar_Get ("fixedtime", "0", CVAR_CHEAT);
 	com_showtrace = Cvar_Get ("com_showtrace", "0", CVAR_CHEAT);
-	com_dropsim = Cvar_Get ("com_dropsim", "0", CVAR_CHEAT);
 	com_viewlog = Cvar_Get( "viewlog", "0", CVAR_CHEAT );
 	com_speeds = Cvar_Get ("com_speeds", "0", 0);
 	com_timedemo = Cvar_Get ("timedemo", "0", 0);
@@ -2906,6 +2928,10 @@ void Com_Frame( void ) {
 		if ( com_speeds->integer ) {
 			timeAfter = Sys_Milliseconds ();
 		}
+	} else {
+		if ( com_speeds->integer ) {
+			timeAfter = timeBeforeEvents = timeBeforeClient = Sys_Milliseconds();
+		}
 	}
 
 	//
@@ -2916,7 +2942,7 @@ void Com_Frame( void ) {
 
 		all = timeAfter - timeBeforeServer;
 		sv = timeBeforeEvents - timeBeforeServer;
-		ev = timeBeforeServer - timeBeforeFirstEvents + timeBeforeClient - timeBeforeEvents;
+		ev = (timeBeforeServer - timeBeforeFirstEvents) + (timeBeforeClient - timeBeforeEvents);
 		cl = timeAfter - timeBeforeClient;
 		sv -= time_game;
 		cl -= time_frontend + time_backend;
@@ -2967,11 +2993,12 @@ void MSG_shutdownHuffman();
 void Com_Shutdown (void)
 {
 	CM_ClearMap();
+	SP_Shutdown ();
 
 	// write config file if anything changed
 	Com_WriteConfiguration();
 
-	if (logfile) {
+	if (logfile > 0) {
 		FS_FCloseFile (logfile);
 		logfile = 0;
 		com_logfile->integer = 0;//don't open up the log file again!!

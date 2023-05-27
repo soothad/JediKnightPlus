@@ -2,7 +2,6 @@
 #include "../qcommon/qcommon.h"
 #include "../qcommon/q_shared.h"
 #include "../client/client.h"
-#include "../client/snd_public.h"
 #include "../sys/sys_local.h"
 
 static cvar_t *in_keyboardDebug = NULL;
@@ -295,9 +294,9 @@ static void IN_ActivateMouse( void )
 	}
 
 	// in_nograb makes no sense in fullscreen mode
-	if( !(SDL_GetWindowFlags( SDL_window ) & SDL_WINDOW_FULLSCREEN) )
+	if( in_nograb->modified || !mouseActive )
 	{
-		if( in_nograb->modified || !mouseActive )
+		if( !(SDL_GetWindowFlags( SDL_window ) & SDL_WINDOW_FULLSCREEN) )
 		{
 			if( in_nograb->integer )
 			{
@@ -309,9 +308,9 @@ static void IN_ActivateMouse( void )
 				SDL_SetRelativeMouseMode( SDL_TRUE );
 				SDL_SetWindowGrab( SDL_window, SDL_TRUE );
 			}
-
-			in_nograb->modified = qfalse;
 		}
+
+		in_nograb->modified = qfalse;
 	}
 
 	mouseActive = qtrue;
@@ -344,7 +343,7 @@ static void IN_DeactivateMouse( void )
 
 		// Don't warp the mouse unless the cursor is within the window
 		if( SDL_GetWindowFlags( SDL_window ) & SDL_WINDOW_MOUSE_FOCUS )
-			SDL_WarpMouseInWindow( SDL_window, cls.glconfig.vidWidth / 2, cls.glconfig.vidHeight / 2 );
+			SDL_WarpMouseInWindow( SDL_window, cls.glconfig.winWidth / 2, cls.glconfig.winHeight / 2 );
 
 		mouseActive = qfalse;
 	}
@@ -854,19 +853,8 @@ static void IN_ProcessEvents( int eventTime )
 					case SDL_WINDOWEVENT_SHOWN:
 					case SDL_WINDOWEVENT_RESTORED:
 					case SDL_WINDOWEVENT_MAXIMIZED:    Cvar_SetValue( "com_minimized", 0 ); break;
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-					{
-						Cvar_SetValue( "com_unfocused", 1 );
-						S_Activate(qfalse);
-						break;
-					}
-
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-					{
-						Cvar_SetValue( "com_unfocused", 0 );
-						S_Activate(qtrue);
-						break;
-					}
+					case SDL_WINDOWEVENT_FOCUS_LOST:   Cvar_SetValue( "com_unfocused", 1 ); break;
+					case SDL_WINDOWEVENT_FOCUS_GAINED: Cvar_SetValue( "com_unfocused", 0 ); break;
 				}
 				break;
 

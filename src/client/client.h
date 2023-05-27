@@ -211,7 +211,6 @@ typedef struct {
 	dlHandle_t	httpHandle;
 
 	char httpdl[128];
-	qboolean httpdlvalid;
 	int udpdl;
 
 	// demo information
@@ -229,6 +228,9 @@ typedef struct {
 
 	// big stuff at end of structure so most offsets are 15 bits or less
 	netchan_t	netchan;
+
+	qboolean	gotInfo;
+	qboolean	gotStatus;
 } clientConnection_t;
 
 extern	clientConnection_t clc;
@@ -351,6 +353,7 @@ typedef struct {
 	qboolean ignoreNextDownloadList;
 
 	int			fixes;
+	qboolean	submodelBypass;
 
 	//EternalJK2MV
 	struct {
@@ -505,6 +508,7 @@ int CL_GetPingQueueCount( void );
 
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
+void CL_UpdateRefConfig( void );
 
 int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 

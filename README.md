@@ -21,11 +21,9 @@ Main Features:
 # Automated Builds
 These builds are automatically generated on every push to the repository. For testing purposes only.
 
-| Windows | Linux / OSX | Codacy |
-|---------|-------------| ------ |
-| [![Windows Build Status](https://ci.appveyor.com/api/projects/status/bwkb8nfl5w6s53u4?svg=true)](https://ci.appveyor.com/project/ouned/jk2mv/history) | [![Linux/OSX Build Status](https://api.travis-ci.org/mvdevs/jk2mv.svg)](https://travis-ci.org/mvdevs/jk2mv/builds) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/872b979ad7dc46aebb6c63d66c1cea77)](https://www.codacy.com/app/mvdevs/jk2mv?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mvdevs/jk2mv&amp;utm_campaign=Badge_Grade)
-
- [ ![Download](https://api.bintray.com/packages/mvdevs/jk2mv/jk2mv-dev/images/download.svg) ](https://bintray.com/mvdevs/jk2mv/jk2mv-dev/_latestVersion/#files)
+| GitHub Actions | Codacy |
+| -------------- | ------ |
+| [![GitHub Actions Badge](https://github.com/mvdevs/jk2mv/actions/workflows/build.yml/badge.svg)](https://github.com/mvdevs/jk2mv/actions?query=branch%3Amaster) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/872b979ad7dc46aebb6c63d66c1cea77)](https://www.codacy.com/app/mvdevs/jk2mv?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mvdevs/jk2mv&amp;utm_campaign=Badge_Grade)
 
 # Howto Build JK2MV
 1. Clone the JK2MV repository
@@ -36,12 +34,12 @@ Clone the JK2MV repository including submodules (required if you also want to bu
  	* Windows: Requires at least Visual Studio 2013, required libraries are shipped with JK2MV in the `libs` directory.
 		* If you plan to build the installer package get NSIS from http://nsis.sourceforge.net
 	* Linux/FreeBSD: OpenGL, OpenAL, SDL2 and depending on your configuration libjpeg, libpng, libminizip, zlib.
-		* Ubuntu/Debian: `apt-get install git debhelper devscripts libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg8-dev libpng12-dev zlib1g-dev libminizip-dev`
+		* Ubuntu/Debian: `apt-get install git debhelper devscripts libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev zlib1g-dev libminizip-dev`
 		* Fedora: `dnf install git SDL2-devel mesa-libGL-devel openal-soft-devel libjpeg-turbo-devel libpng-devel zlib-devel minizip-devel`
-	* MacOSX: XCode on MacOSX >= 10.6
+	* MacOSX: XCode on MacOSX >= 10.9
 		* Configure / Build SDL2:
-			1. `curl -O https://www.libsdl.org/release/SDL2-2.0.8.tar.gz`
-			2. `tar xzf SDL2-2.0.8.tar.gz && cd SDL2-2.0.8/Xcode/SDL`
+			1. `curl -O https://www.libsdl.org/release/SDL2-2.0.10.tar.gz`
+			2. `tar xzf SDL2-2.0.10.tar.gz && cd SDL2-2.0.10/Xcode/SDL`
 			4. `sed -i -e 's/@rpath//g' SDL.xcodeproj/project.pbxproj` (packaging fails otherwise)
 			5. `xcodebuild -configuration Release`
 			6. `mkdir -p ~/Library/Frameworks/`

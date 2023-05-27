@@ -46,10 +46,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <ctype.h>
-#include <errno.h>
 #include <limits.h>
 #include <stdint.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #ifdef __cplusplus
 #	include <cstddef>
@@ -74,6 +74,12 @@
 #define idarm32	1
 #else
 #define idarm32	0
+#endif
+
+#if defined(ARCH_ARM64) && !defined __LCC__
+#define idarm64	1
+#else
+#define idarm64	0
 #endif
 
 #if (defined(powerc) || defined(powerpc) || defined(ppc) || defined(__ppc) || defined(__ppc__)) && !defined __LCC__
@@ -211,6 +217,9 @@
 #elif idarm32
 #define ARCH_STRING "arm"
 #define Q_LITTLE_ENDIAN
+#elif idarm64
+#define ARCH_STRING "arm64"
+#define Q_LITTLE_ENDIAN
 #elif idppc
 #define ARCH_STRING "ppc"
 #define Q_BIG_ENDIAN
@@ -320,8 +329,12 @@ typedef enum {
 #define STR(x) #x
 #define XSTR(x) STR(x)
 
+#ifndef MIN
 #define MIN(x,y)	((x)<(y)?(x):(y))
+#endif
+#ifndef MAX
 #define MAX(x,y)	((x)>(y)?(x):(y))
+#endif
 #define CTRL(a)		((a)-'a'+1)
 
 #define PAD(base, alignment)	(((base)+(alignment)-1) & ~((alignment)-1))
