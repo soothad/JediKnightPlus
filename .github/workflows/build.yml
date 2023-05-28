@@ -3,9 +3,9 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: master
+    branches: eternaljk2
   pull_request:
-    branches: master
+    branches: eternaljk2
   release:
     types: [created]
 
