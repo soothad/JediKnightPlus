@@ -1194,7 +1194,7 @@ void R_Register( void )
 	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_CHEAT);
 	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
 	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);
-	r_clear = ri.Cvar_Get ("r_clear", "0", 0);
+	r_clear = ri.Cvar_Get ("r_clear", "8", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_offsetFactor = ri.Cvar_Get( "r_offsetfactor", "-1", CVAR_CHEAT );
 	r_offsetUnits = ri.Cvar_Get( "r_offsetunits", "-2", CVAR_CHEAT );
 	r_drawBuffer = ri.Cvar_Get( "r_drawBuffer", "GL_BACK", CVAR_CHEAT );
@@ -1242,7 +1242,7 @@ Ghoul2 Insert End
 
 	r_consoleFont = ri.Cvar_Get("r_consoleFont", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_consoleFont->modified = qtrue;
-	r_fontSharpness = ri.Cvar_Get("r_fontSharpness", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
+	r_fontSharpness = ri.Cvar_Get("r_fontSharpness", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_textureLODBias = ri.Cvar_Get("r_textureLODBias", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_saberGlow = ri.Cvar_Get("r_saberGlow", "1", CVAR_ARCHIVE | CVAR_LATCH);
 	r_environmentMapping = ri.Cvar_Get("r_environmentMapping", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
