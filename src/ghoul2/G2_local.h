@@ -5,8 +5,8 @@
 class CMiniHeap;
 
 // internal surface calls  G2_surfaces.cpp
-qboolean	G2_SetSurfaceOnOff (const char *fileName, surfaceInfo_v &slist, const char *surfaceName, const int offFlags);
-int			G2_IsSurfaceOff (const char *fileName, surfaceInfo_v &slist, const char *surfaceName);
+qboolean	G2_SetSurfaceOnOff (CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName, const int offFlags);
+int			G2_IsSurfaceOff (CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName);
 qboolean	G2_SetRootSurface(g2handle_t g2h, CGhoul2Info_v &ghoul2, const int modelIndex, const char *surfaceName);
 int			G2_AddSurface(CGhoul2Info *ghoul2, int surfaceNumber, int polyNumber, float BarycentricI, float BarycentricJ, int lod );
 qboolean	G2_RemoveSurface(surfaceInfo_v &slist, const int index);
@@ -14,7 +14,7 @@ surfaceInfo_t *G2_FindOverrideSurface(int surfaceNum, surfaceInfo_v &surfaceList
 int			G2_IsSurfaceLegal(void *mod, const char *surfaceName, int *flags);
 int			G2_GetParentSurface(const char *fileName, const int index);
 int			G2_GetSurfaceIndex(const char *fileName, const char *surfaceName);
-int			G2_IsSurfaceRendered(const char *fileName, const char *surfaceName, surfaceInfo_v &slist);
+int			G2_IsSurfaceRendered(CGhoul2Info *ghlInfo, const char *surfaceName, surfaceInfo_v &slist);
 
 // internal bone calls - G2_Bones.cpp
 qboolean	G2_Set_Bone_Angles(const char *fileName, boneInfo_v &blist, const char *boneName, const float *angles, const int flags,
@@ -155,7 +155,7 @@ void		G2API_LoadGhoul2Models(g2handle_t g2h, char *buffer);
 void		G2API_LoadSaveCodeDestructGhoul2Info(g2handle_t g2h);
 void		G2API_FreeSaveBuffer(char *buffer);
 char		*G2API_GetAnimFileNameIndex(qhandle_t modelIndex);
-int			G2API_GetSurfaceRenderStatus(CGhoul2Info *ghlInfo, const char *surfaceName);
+int			G2API_GetSurfaceRenderStatus(CGhoul2Info_v& ghoul2, int modelIndex, const char *surfaceName);
 void		G2API_CopySpecificG2Model(g2handle_t g2hFrom, int modelFrom, g2handle_t g2hTo, int modelTo);
 void		G2API_DuplicateGhoul2Instance(g2handle_t g2hFrom, g2handle_t *g2hToPtr);
 

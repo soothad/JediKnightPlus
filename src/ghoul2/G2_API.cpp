@@ -214,7 +214,7 @@ qboolean G2API_SetSurfaceOnOff(g2handle_t g2h, const char *surfaceName, const in
 		CGhoul2Info &ghlInfo = ghoul2->front();
 
 		ghlInfo.mMeshFrameNum = 0;
-		return G2_SetSurfaceOnOff(ghlInfo.mFileName, ghlInfo.mSlist, surfaceName, flags);
+		return G2_SetSurfaceOnOff(&ghlInfo, ghlInfo.mSlist, surfaceName, flags);
 	}
 
 	return qfalse;
@@ -222,11 +222,7 @@ qboolean G2API_SetSurfaceOnOff(g2handle_t g2h, const char *surfaceName, const in
 
 int G2API_GetSurfaceOnOff(CGhoul2Info *ghlInfo, const char *surfaceName)
 {
-	if (ghlInfo)
-	{
-		return G2_IsSurfaceOff(ghlInfo->mFileName, ghlInfo->mSlist, surfaceName);
-	}
-	return -1;
+	return G2_IsSurfaceOff(ghlInfo, ghlInfo->mSlist, surfaceName);
 }
 
 qboolean G2API_SetRootSurface(g2handle_t g2h, const int modelIndex, const char *surfaceName)
@@ -272,13 +268,10 @@ int G2API_GetParentSurface(CGhoul2Info *ghlInfo, const int index)
 	return -1;
 }
 
-int G2API_GetSurfaceRenderStatus(CGhoul2Info *ghlInfo, const char *surfaceName)
+int G2API_GetSurfaceRenderStatus(CGhoul2Info_v& ghoul2, int modelIndex, const char *surfaceName)
 {
-	if (ghlInfo)
-	{
-		return G2_IsSurfaceRendered(ghlInfo->mFileName, surfaceName, ghlInfo->mSlist);
-	}
-	return -1;
+	CGhoul2Info *ghlInfo = &ghoul2[modelIndex];
+	return G2_IsSurfaceRendered(ghlInfo, surfaceName, ghlInfo->mSlist);
 }
 
 qboolean G2API_HasGhoul2ModelOnIndex(const g2handle_t *g2hPtr, const int modelIndex)
