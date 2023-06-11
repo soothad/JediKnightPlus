@@ -4050,7 +4050,9 @@ int FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, u
 
 	// Only check the unresolved path for invalid characters, the os probably knows what it's doing
 	if ( FS_ContainsInvalidCharacters(qpath) ) {
-		Com_Printf( "FS_FOpenFileByMode: invalid filename (%s)\n", qpath );
+		if (fs_debug->integer)
+			Com_Printf( "FS_FOpenFileByMode: invalid filename (%s)\n", qpath );
+		*f = 0;
 		return -1;
 	}
 
