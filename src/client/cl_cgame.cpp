@@ -1380,6 +1380,27 @@ Ghoul2 Insert End
 		cl.mSharedMemory = VMAP(1, char, MAX_CG_SHARED_BUFFER_SIZE);
 		return 0;
 
+	case CG_G2_SETSKIN:
+	{
+		CGhoul2Info_v *ghoul2Ptr = G2API_GetGhoul2Model(args[1]);
+		int modelIndex = args[2];
+
+		if (!ghoul2Ptr)
+		{
+			assert(0);
+			return qfalse;
+		}
+
+		CGhoul2Info_v &ghoul2 = *ghoul2Ptr;
+
+		if (ghoul2.size() <= (unsigned)modelIndex || ghoul2[modelIndex].mModelindex == -1)
+		{
+			return qfalse;
+		}
+
+		return G2API_SetSkin( ghoul2, modelIndex, args[3], args[4] );
+	}
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
 	}
