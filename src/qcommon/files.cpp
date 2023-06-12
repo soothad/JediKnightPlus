@@ -3018,11 +3018,6 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 				strcmp(filename, "assets2.pk3") && strcmp(filename, "assets5.pk3")) {
 				continue;
 			}
-		} else if ( assetsJKA ) {
-			if (strcmp(filename, "assets0.pk3") && strcmp(filename, "assets1.pk3") &&
-			    strcmp(filename, "assets2.pk3") && strcmp(filename, "assets3.pk3")) {
-				continue;
-			}
 		}
 
 		if ( ( pak = FS_LoadZipFile( pakfile, pakfiles[i], assetsJKA ) ) == 0 )
