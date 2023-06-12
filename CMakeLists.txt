@@ -328,7 +328,7 @@ endif()
 
 if(UseInternalJPEG)
 	set(GlobalDefines ${GlobalDefines} "INTERNAL_JPEG")
-	add_subdirectory(libs/jpeg-9a)
+	add_subdirectory(libs/jpeg-9e)
 endif()
 
 if(UseInternalPNG)
