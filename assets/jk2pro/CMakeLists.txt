@@ -37,6 +37,15 @@ set(AssetsFiles
 
 	"models/flags/n_flag.md3"
 	"models/map_objects/mp/flag3.jpg"
+	"models/players/desann/sounds.cfg"
+	"models/players/galak/sounds.cfg"
+	"models/players/jeditrainer/sounds.cfg"
+	"models/players/kyle/sounds.cfg"
+	"models/players/lando/sounds.cfg"
+	"models/players/luke/sounds.cfg"
+	"models/players/morgan/sounds.cfg"
+	"models/players/ugnaught/sounds.cfg"
+	"models/players/weequay/sounds.cfg"
 
 	"shaders/ctf3_yellowteam.shader"
 	"shaders/q3mod.shader"
