@@ -1280,6 +1280,35 @@ qboolean G2API_SetNewOrigin(g2handle_t g2h, const int boltIndex)
 	return qfalse;
 }
 
+//see if surfs have any shader info...
+qboolean G2API_SkinlessModel(CGhoul2Info_v& ghoul2, int modelIndex)
+{
+	CGhoul2Info *g2 = &ghoul2[modelIndex];
+	model_t *mod = R_GetModelByHandle(g2->mModel);
+
+	if (mod &&
+		mod->mdxm)
+	{
+        mdxmSurfHierarchy_t	*surf;
+		int i;
+
+		surf = (mdxmSurfHierarchy_t *) ( (byte *)mod->mdxm + mod->mdxm->ofsSurfHierarchy );
+
+		for (i = 0; i < mod->mdxm->numSurfaces; i++)
+		{
+			if (surf->shader[0])
+			{ //found a surface with a shader name, ok.
+                return qfalse;
+			}
+
+  			surf = (mdxmSurfHierarchy_t *)( (byte *)surf + (intptr_t)( &((mdxmSurfHierarchy_t *)0)->childIndexes[ surf->numChildren ] ));
+		}
+	}
+
+	//found nothing.
+	return qtrue;
+}
+
 #if 0
 
 int G2API_GetBoneIndex(CGhoul2Info *ghlInfo, const char *boneName)
