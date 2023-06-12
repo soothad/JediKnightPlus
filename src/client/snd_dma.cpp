@@ -1552,6 +1552,10 @@ S_Activate
 */
 void S_Activate(qboolean activate)
 {
+	if (activate) {
+		S_ClearSoundBuffer();
+	}
+
 #ifdef USE_OPENAL
 	if (s_UseOpenAL)
 	{
