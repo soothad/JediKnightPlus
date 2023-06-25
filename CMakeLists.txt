@@ -172,6 +172,9 @@ endif()
 set(MVMP "eternaljk2mvmp")
 set(MVMENU_STRING "eternaljk2mvmenu")
 set(MVMENU "${MVMENU_STRING}_${Architecture}")
+set(MVGAME "jk2mpgame_${Architecture}")
+set(MVCGAME "cgame_${Architecture}")
+set(MVUI "ui_${Architecture}")
 
 set(MVDED "eternaljk2mvded")
 

@@ -550,6 +550,9 @@ if (BuildMVMP)
 
 	if(BuildMVSDK)
 		add_dependencies(${MVMP} bins-jk2pro)
+		add_dependencies(${MVMP} ${MVGAME})
+		add_dependencies(${MVMP} ${MVCGAME})
+		add_dependencies(${MVMP} ${MVUI})
 	endif()
 
 	# mvmenu is now built from source conainted in the mvsdk submodule
@@ -608,6 +611,7 @@ if (BuildMVMP)
 	if(BuildPortableVersion)
 		if(WIN32)
 			install(TARGETS ${MVMENU} RUNTIME DESTINATION ".")
+			install(FILES $<TARGET_PDB_FILE:${MVMENU}> DESTINATION "." OPTIONAL)
 		else()
 			install(TARGETS ${MVMENU} LIBRARY DESTINATION ".")
 		endif()
@@ -661,6 +665,9 @@ if (BuildMVDED)
 
 	if(BuildMVSDK)
 		add_dependencies(${MVDED} bins-jk2pro)
+		add_dependencies(${MVMP} ${MVGAME})
+		add_dependencies(${MVMP} ${MVCGAME})
+		add_dependencies(${MVMP} ${MVUI})
 	endif()
 
 	# installation
