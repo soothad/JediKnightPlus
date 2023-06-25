@@ -1715,6 +1715,66 @@ void CL_FirstSnapshot( void ) {
 
 /*
 ==================
+CL_AvgPing
+
+Calculates Average Ping from snapshots in buffer. Used by AutoNudge.
+==================
+*/
+static float CL_AvgPing( void ) {
+	int ping[PACKET_BACKUP];
+	int count = 0;
+	int i, j, iTemp;
+	float result;
+
+	for ( i = 0; i < PACKET_BACKUP; i++ ) {
+		if ( cl.snapshots[i].ping > 0 && cl.snapshots[i].ping < 999 ) {
+			ping[count] = cl.snapshots[i].ping;
+			count++;
+		}
+	}
+
+	if ( count == 0 )
+		return 0;
+
+	// sort ping array
+	for ( i = count - 1; i > 0; --i ) {
+		for ( j = 0; j < i; ++j ) {
+			if (ping[j] > ping[j + 1]) {
+				iTemp = ping[j];
+				ping[j] = ping[j + 1];
+				ping[j + 1] = iTemp;
+			}
+		}
+	}
+
+	// use median average ping
+	if ( (count % 2) == 0 )
+		result = (ping[count / 2] + ping[(count / 2) - 1]) / 2.0f;
+	else
+		result = ping[count / 2];
+
+	return result;
+}
+
+
+/*
+==================
+CL_TimeNudge
+
+Returns either auto-nudge or cl_timeNudge value.
+==================
+*/
+static int CL_TimeNudge( void ) {
+	float autoNudge = cl_autoNudge->value;
+
+	if ( autoNudge != 0.0f )
+		return (int)((CL_AvgPing() * autoNudge) + 0.5f) * -1;
+	else
+		return cl_timeNudge->integer;
+}
+
+/*
+==================
 CL_SetCGameTime
 ==================
 */
@@ -1770,7 +1830,7 @@ void CL_SetCGameTime( void ) {
 		// smoothness or better responsiveness.
 		int tn;
 
-		tn = cl_timeNudge->integer;
+		tn = CL_TimeNudge();
 
 		if (tn < 0 && (cl.snap.ps.pm_type == PM_SPECTATOR || cl.snap.ps.pm_flags & PMF_FOLLOW || clc.demoplaying))
 			tn = 0; // JAPRO ENGINE - disable negative timenudge when spectating

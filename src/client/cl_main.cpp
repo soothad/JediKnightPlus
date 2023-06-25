@@ -32,6 +32,7 @@ cvar_t	*rconAddress;
 cvar_t	*cl_timeout;
 cvar_t	*cl_maxpackets;
 cvar_t	*cl_packetdup;
+cvar_t	*cl_autoNudge;
 cvar_t	*cl_timeNudge;
 cvar_t	*cl_showTimeDelta;
 cvar_t	*cl_freezeDemo;
@@ -3108,6 +3109,7 @@ void CL_Init( void ) {
 
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
 
+	cl_autoNudge = Cvar_Get( "cl_autoNudge", "0", CVAR_TEMP );
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
 	cl_showSend = Cvar_Get ("cl_showSend", "0", CVAR_TEMP );
