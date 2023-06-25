@@ -87,7 +87,7 @@ add_custom_target(assets-jk2pro DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/jk2pro-asse
 if(WIN32 OR BuildPortableVersion)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/jk2pro-assets.pk3 DESTINATION "eternaljk2")
 elseif(APPLE)
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/jk2pro-assets.pk3 DESTINATION "jk2mvmp.app/Contents/MacOS/eternaljk2")
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/jk2pro-assets.pk3 DESTINATION "${MVMP}.app/Contents/MacOS/eternaljk2")
 else()
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/jk2pro-assets.pk3 DESTINATION "share/jk2mv/eternaljk2")
 endif()
