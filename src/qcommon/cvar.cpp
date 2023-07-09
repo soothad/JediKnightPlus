@@ -807,6 +807,59 @@ void Cvar_SetA_f( void ) {
 
 /*
 ============
+Cvar_Math_f
+============
+*/
+void Cvar_Math_f( void )
+{
+	int		c;
+	char	*cmd;
+	float	value;
+
+	c = Cmd_Argc();
+	cmd = Cmd_Argv( 0 );
+
+	if ( c != 3 )
+	{
+		Com_Printf( "usage: %s <variable> <value>\n", cmd );
+		return;
+	}
+
+	if ( !Q_stricmp( cmd, "cvarAdd" ) )
+	{
+		value = Cvar_VariableValue( Cmd_Argv( 1 ) ) + atof( Cmd_Argv( 2 ) );
+		Cvar_Set2( Cmd_Argv( 1 ), va("%f", value), qfalse);
+	}
+	else if ( !Q_stricmp( cmd, "cvarSub" ) )
+	{
+		value = Cvar_VariableValue( Cmd_Argv( 1 ) ) - atof( Cmd_Argv( 2 ) );
+		Cvar_Set2( Cmd_Argv( 1 ), va("%f", value), qfalse );
+	}
+	else if ( !Q_stricmp( cmd, "cvarMult" ) )
+	{
+		value = Cvar_VariableValue( Cmd_Argv( 1 ) ) * atof( Cmd_Argv( 2 ) );
+		Cvar_Set2( Cmd_Argv( 1 ), va("%f", value), qfalse );
+	}
+	else if ( !Q_stricmp( cmd, "cvarDiv" ) )
+	{
+		value = atof( Cmd_Argv( 2 ) );
+		if ( value != 0 )
+		{
+			value = Cvar_VariableValue( Cmd_Argv( 1 ) ) / value;
+			Cvar_Set2( Cmd_Argv( 1 ), va("%f", value), qfalse );
+		}
+		else
+			Com_Printf( "Cannot divide by zero!\n" );
+	}
+	else if ( !Q_stricmp( cmd, "cvarMod" ) )
+	{
+		value = Cvar_VariableIntegerValue( Cmd_Argv( 1 ) ) % atoi( Cmd_Argv( 2 ) );
+		Cvar_Set2( Cmd_Argv( 1 ), va("%f", value), qfalse );
+	}
+}
+
+/*
+============
 Cvar_Reset_f
 ============
 */
@@ -946,6 +999,51 @@ void Cvar_List_f( void ) {
 
 	Com_Printf ("\n%i total cvars\n", i);
 	Com_Printf ("%i cvar indexes\n", cvar_numIndexes);
+}
+
+void Cvar_ListUserCreated_f( void ) {
+	cvar_t *var = NULL;
+	uint32_t count = 0;
+
+	// build a list of cvars that are modified
+	for ( var=cvar_vars;
+		var;
+		var=var->next )
+	{
+		const char *value = var->latchedString ? var->latchedString : var->string;
+		if ( !(var->flags & CVAR_USER_CREATED) )
+			continue;
+
+		Com_Printf_Ext(qtrue, S_COLOR_JK2MV "Cvar " S_COLOR_WHITE "%s = " S_COLOR_JK2MV "\"", var->name);
+		Com_Printf_Ext(qfalse, S_COLOR_WHITE "%s", value);
+		Com_Printf_Ext(qtrue, S_COLOR_JK2MV "\"" S_COLOR_WHITE "\n");
+		count++;
+	}
+
+	if ( count > 0 )
+		Com_Printf_Ext( qtrue, S_COLOR_JK2MV "Showing " S_COLOR_WHITE "%u" S_COLOR_JK2MV " user created cvars" S_COLOR_WHITE "\n", count );
+	else
+		Com_Printf_Ext( qtrue, S_COLOR_JK2MV "No user created cvars" S_COLOR_WHITE "\n" );
+}
+
+void Cvar_ListModified_f( void ) {
+	cvar_t *var = NULL;
+
+	// build a list of cvars that are modified
+	for ( var=cvar_vars;
+		var;
+		var=var->next )
+	{
+		const char *value = var->latchedString ? var->latchedString : var->string;
+		if ( !var->name || !var->modificationCount || !strcmp( value, var->resetString ) )
+			continue;
+
+		Com_Printf_Ext(qtrue, S_COLOR_JK2MV "Cvar " S_COLOR_WHITE "%s = " S_COLOR_JK2MV "\"", var->name);
+		Com_Printf_Ext(qfalse, S_COLOR_WHITE "%s", value);
+		Com_Printf_Ext(qtrue, S_COLOR_JK2MV "\"" S_COLOR_WHITE ", " S_COLOR_WHITE "default = " S_COLOR_JK2MV "\"");
+		Com_Printf_Ext(qfalse, S_COLOR_WHITE "%s", var->resetString);
+		Com_Printf_Ext(qtrue, S_COLOR_JK2MV "\"" S_COLOR_WHITE "\n");
+	}
 }
 
 /*
@@ -1174,8 +1272,20 @@ void Cvar_Init (void) {
 	Cmd_SetCommandCompletionFunc( "setu", Cvar_CompleteCvarName );
 	Cmd_AddCommand ("seta", Cvar_SetA_f);
 	Cmd_SetCommandCompletionFunc( "seta", Cvar_CompleteCvarName );
+	Cmd_AddCommand ("cvarAdd", Cvar_Math_f );
+	Cmd_SetCommandCompletionFunc( "cvarAdd", Cvar_CompleteCvarName );
+	Cmd_AddCommand ("cvarSub", Cvar_Math_f );
+	Cmd_SetCommandCompletionFunc( "cvarSub", Cvar_CompleteCvarName );
+	Cmd_AddCommand ("cvarMult", Cvar_Math_f );
+	Cmd_SetCommandCompletionFunc( "cvarMult", Cvar_CompleteCvarName );
+	Cmd_AddCommand ("cvarDiv", Cvar_Math_f );
+	Cmd_SetCommandCompletionFunc( "cvarDiv", Cvar_CompleteCvarName );
+	Cmd_AddCommand ("cvarMod", Cvar_Math_f );
+	Cmd_SetCommandCompletionFunc( "cvarMod", Cvar_CompleteCvarName );
 	Cmd_AddCommand ("reset", Cvar_Reset_f);
 	Cmd_SetCommandCompletionFunc( "reset", Cvar_CompleteCvarName );
 	Cmd_AddCommand ("cvarlist", Cvar_List_f);
+	Cmd_AddCommand ("cvar_usercreated", Cvar_ListUserCreated_f );
+	Cmd_AddCommand ("cvar_modified", Cvar_ListModified_f );
 	Cmd_AddCommand ("cvar_restart", Cvar_Restart_f);
 }
