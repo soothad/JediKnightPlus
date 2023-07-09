@@ -30,7 +30,7 @@
 			group				camera
 			type				ITEM_TYPE_MULTI
 			text				"HUD:"
-			cvar				cg_draw2d
+			cvar				cg_draw2D
 			cvarFloatList
 			{
 				@MENUS0_OFF 0
@@ -108,14 +108,13 @@
 			group				camera
 			type				ITEM_TYPE_MULTI
 			text				"Smooth Camera:"
-			cvar				cg_cameraFPS
+			cvar				cg_smoothCamera
 			cvarFloatList
 			{
-				@MENUS0_OFF 125
-				@MENUS0_ON 30
-				"BaseJK2" 0
+				@MENUS0_OFF 0
+				@MENUS0_ON 1
 			}
-			rect				80 24 116 20
+			rect				100 24 116 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			0
 			textaligny			0
@@ -131,63 +130,19 @@
 		
 		itemDef
 		{
-			name				zoomText
+			name				smoothField
 			group				camera
-			type				ITEM_TYPE_TEXT
-			text				"Zoom:"
-			cvar				cg_draw2d
-			rect				136 24 34 20
-			textalign			ITEM_ALIGN_LEFT
-			textalignx			0
-			textaligny			0
-			font				4
-			textscale			0.75
-			forecolor			1 1 1 1
-			visible				1
-		}
-		
-		itemDef
-		{
-			name				zoomEnable
-			group				camera
-			type				ITEM_TYPE_BUTTON
-			text				"Enable"
-			cvar				cg_draw2d
-			rect				180 24 36 20
-			textalign			ITEM_ALIGN_LEFT
-			textalignx			0
-			textaligny			0
-			font				4
+			type				ITEM_TYPE_NUMERICFIELD
+			text				"Camera FPS:"
+			cvar				"cg_smoothCameraFPS"
+			rect				150 24 116 20
+			font 				4
 			textscale			0.75
 			forecolor			.615 .615 .956 1
+			cvartest			"cg_smoothCamera"
+			showCvar			{ "1" }
 			visible				1
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-				exec			"+zoom"
-			}
-		}
-		
-		itemDef
-		{
-			name				zoomDisable
-			group				camera
-			type				ITEM_TYPE_BUTTON
-			text				"Disable"
-			cvar				cg_draw2d
-			rect				226 24 34 20
-			textalign			ITEM_ALIGN_LEFT
-			textalignx			0
-			textaligny			0
-			font				4
-			textscale			0.75
-			forecolor			.615 .615 .956 1
-			visible				1
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-				exec			"-zoom"
-			}
+			action				{ play "sound/interface/button1.wav" ; }
 		}
 		
 		itemDef
@@ -239,7 +194,7 @@
 			action
 			{
 				play "sound/interface/button1.wav" ;
-				setcvar cg_fov "90.0"
+				setcvar cg_fov "90"
 			}
 		}
 		
@@ -292,60 +247,7 @@
 			action
 			{
 				play "sound/interface/button1.wav" ;
-				setcvar cg_fovViewmodel "80.0"
-			}
-		}
-		
-		itemDef
-		{
-			name				zoomFovSlider
-			group				camera
-			type				ITEM_TYPE_SLIDER
-			text				"Zoom FOV:"
-			cvarfloat			"cg_zoomfov" 30 10 90
-			rect				10 84 156 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			52
-			font				4
-			textscale			0.75
-			forecolor			.615 .615 .956 1
-			visible				1
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-		}
-		
-		itemDef 
-		{
-			name				zoomFovField
-			group				camera
-			type				ITEM_TYPE_NUMERICFIELD
-			text				""
-			cvar				"cg_zoomfov"
-			rect				176 84 40 20
-			font 				4
-			textscale			0.75
-			forecolor			.615 .615 .956 1
-			visible				1
-			action				{ play "sound/interface/button1.wav" ; }
-		}
-		
-		itemDef
-		{
-			name				zoomFovReset
- 			group				camera
-	 		type				ITEM_TYPE_BUTTON
-			text				"Reset"
-			rect				226 84 30 20
-			font 				4
-			textscale			0.75
-			forecolor			1 .682 0 1
-			visible				1
-			action
-			{
-				play "sound/interface/button1.wav" ;
-				setcvar cg_zoomfov "30.0"
+				setcvar cg_fovViewmodel "80"
 			}
 		}
 
@@ -398,7 +300,7 @@
 			action
 			{
 				play "sound/interface/button1.wav" ;
-				setcvar cg_thirdPersonRange "80.0"
+				setcvar cg_thirdPersonRange "80"
 			}
 		}
 		
@@ -448,7 +350,7 @@
 			action
 			{
 				play "sound/interface/button1.wav" ;
-				setcvar cg_thirdPersonAngle "0.0"
+				setcvar cg_thirdPersonAngle "0"
 			}
 		}
 		
@@ -498,7 +400,7 @@
 			action
 			{
 				play "sound/interface/button1.wav" ;
-				setcvar cg_thirdPersonPitchOffset "0.0"
+				setcvar cg_thirdPersonPitchOffset "0"
 			}
 		}
 		
@@ -548,7 +450,7 @@
 			action
 			{
 				play "sound/interface/button1.wav" ;
-				setcvar cg_thirdPersonVertOffset "16.0"
+				setcvar cg_thirdPersonVertOffset "16"
 			}
 		}
 		
@@ -598,7 +500,7 @@
 			action
 			{
 				play "sound/interface/button1.wav" ;
-				setcvar cg_thirdPersonHorzOffset "0.0"
+				setcvar cg_thirdPersonHorzOffset "0"
 			}
 		}
 		
