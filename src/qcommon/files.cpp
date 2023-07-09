@@ -242,6 +242,7 @@ static	cvar_t		*fs_loadjka;
 static	cvar_t		*fs_basegame;
 static	cvar_t		*fs_copyfiles;
 static	cvar_t		*fs_gamedirvar;
+static	cvar_t		*fs_dirBeforePak; //rww - when building search path, keep directories at top and insert pk3's under them
 static	cvar_t		*fs_forcegame;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
@@ -2962,6 +2963,7 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 	searchpath_t	*sp;
 	int				i;
 	searchpath_t	*search;
+	searchpath_t	*thedir = NULL;
 	pack_t			*pak;
 	char			*pakfile;
 	int				numfiles;
@@ -2995,6 +2997,7 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 		Q_strncpyz(search->dir->gamedir, dir, sizeof(search->dir->gamedir));
 		search->next = fs_searchpaths;
 		fs_searchpaths = search;
+		thedir = search;
 	}
 
 	// find all pak files in this directory
@@ -3060,8 +3063,24 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 
 		search = (searchpath_s *)Z_Malloc (sizeof(searchpath_t), TAG_FILESYS, qtrue);
 		search->pack = pak;
-		search->next = fs_searchpaths;
-		fs_searchpaths = search;
+
+		if (fs_dirBeforePak && fs_dirBeforePak->integer && thedir)
+		{
+			searchpath_t *oldnext = thedir->next;
+			thedir->next = search;
+
+			while (oldnext)
+			{
+				search->next = oldnext;
+				search = search->next;
+				oldnext = oldnext->next;
+			}
+		}
+		else
+		{
+			search->next = fs_searchpaths;
+			fs_searchpaths = search;
+		}
 	}
 
 	// done
@@ -3336,6 +3355,7 @@ static void FS_Startup( const char *gameName ) {
 	fs_homepath = Cvar_Get ("fs_homepath", Sys_DefaultHomePath(), CVAR_INIT | CVAR_VM_NOWRITE );
 	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 	fs_forcegame = Cvar_Get ("fs_forcegame", "eternaljk2", CVAR_INIT );
+	fs_dirBeforePak = Cvar_Get ("fs_dirBeforePak", "1", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL );
 
 	assetsPath = Sys_DefaultAssetsPath();
 	fs_assetspath = Cvar_Get("fs_assetspath", assetsPath ? assetsPath : "", CVAR_INIT | CVAR_VM_NOWRITE);
@@ -3876,6 +3896,7 @@ void FS_InitFilesystem( void ) {
 	Com_StartupVariable( "fs_copyfiles" );
 	Com_StartupVariable( "fs_restrict" );
 	Com_StartupVariable( "fs_forcegame" );
+	Com_StartupVariable( "fs_dirBeforePak" );
 
 	// try to start up normally
 	FS_Startup( BASEGAME );
