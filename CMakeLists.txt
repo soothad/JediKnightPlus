@@ -24,7 +24,7 @@ set(ProjectURL "https://jk2mv.org")
 project(${ProjectName})
 
 include(GetGitRevisionDescription)
-git_describe(MV_VERSION --tags)
+git_describe(MV_VERSION --tags --match 1.4)
 if(NOT MV_VERSION OR MV_VERSION STREQUAL "GIT-NOTFOUND" OR MV_VERSION STREQUAL "HEAD-HASH-NOTFOUND")
 	set(MV_VERSION "1.4.1")
 	message(WARNING "Could not find git or git repository. Install git and make sure you actually cloned the repository (Directory named .git must exist) for correct versioning.")
