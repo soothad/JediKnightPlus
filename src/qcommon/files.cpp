@@ -1286,8 +1286,7 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 
 	isLocalConfig = ( !strcmp( filename, "autoexec.cfg" ) ||
 		!strcmp( filename, "eternaljk2mv.cfg" ) ||
-		!strcmp( filename, "eternaljk2mvserver.cfg" ) ||
-		!strcmp( filename, "eternaljk2mvglobal.cfg" ) );
+		!strcmp( filename, "eternaljk2mvserver.cfg" ) );
 
 	//
 	// search through the path, one element at a time

@@ -887,7 +887,7 @@ static int QDECL Cvar_CvarCmp(const void *p1, const void *p2) {
 	return strcmp( (*e1)->name, (*e2)->name );
 }
 
-void Cvar_WriteVariables( fileHandle_t f, qboolean locals ) {
+void Cvar_WriteVariables( fileHandle_t f ) {
 	cvar_t	*var;
 	char	buffer[1024];
 	cvar_t *sortedCvars[MAX_CVARS];
@@ -895,8 +895,7 @@ void Cvar_WriteVariables( fileHandle_t f, qboolean locals ) {
 	int i;
 	int numSorted = 0;
 	for (var = cvar_vars ; var ; var = var->next) {
-		if((var->flags & CVAR_ARCHIVE) &&
-				( ( locals && !(var->flags & CVAR_GLOBAL) ) || ( !locals && (var->flags & CVAR_GLOBAL) ) ) ) {
+		if (var->flags & CVAR_ARCHIVE) {
 			sortedCvars[numSorted++] = var;
 		}
 	}

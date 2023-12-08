@@ -1943,13 +1943,7 @@ void CL_NextDownload(void) {
 		clc.downloadRestart = qtrue;
 
 		Q_strncpyz(remoteNameCpy, remoteName, sizeof(remoteNameCpy));
-
-		if (Cvar_VariableIntegerValue("fs_globalcfg") && Q_stricmpn(localName, "base/", 4)) {
-			Com_sprintf(localNameCpy, sizeof(localNameCpy), "base/%s", Q_strchrs(localName, "/")+1);
-		}
-		else {
-			Q_strncpyz(localNameCpy, localName, sizeof(localNameCpy));
-		}
+		Q_strncpyz(localNameCpy, localName, sizeof(localNameCpy));
 
 		// move over the rest
 		memmove( clc.downloadList, s, strlen(s) + 1);
