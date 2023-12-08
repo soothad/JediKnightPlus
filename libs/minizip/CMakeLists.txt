@@ -6,9 +6,7 @@
 # directories and target link libraries.
 #
 # The bundled copy is produced by taking the files ioapi.{c,h} and unzip.{c,h}
-# from the contrib/minizip directory of the zlib release tarball.  The only
-# changes applied are modifications of the macros ALLOC and TRYFREE in unzip.c,
-# and a compatibility definition of the macro OF in include/ioapi.h
+# from the contrib/minizip directory of the zlib release tarball.
 #
 # Since minizip is expected to be reference by user code as
 #
@@ -16,7 +14,7 @@
 #
 # the public header files are split into the include/minizip subdirectory.
 #
-# The current bundled copy comes from the zlib 1.2.8 release.
+# The current bundled copy comes from the zlib 643e17b7498d12ab8d15565662880579692f769d (November 14, 2023).
 
 # These settings only apply to this directory.
 include_directories(${ZLIB_INCLUDE_DIRS})
