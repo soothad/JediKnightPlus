@@ -1199,5 +1199,5 @@ void CL_InitInput( void ) {
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
 	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);
 
-	cl_idrive = Cvar_Get("cl_idrive", "0", CVAR_ARCHIVE);//JAPRO ENGINE
+	cl_idrive = Cvar_Get("cl_idrive", "1", CVAR_ARCHIVE);//JAPRO ENGINE
 }
