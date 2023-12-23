@@ -1,0 +1,1061 @@
+//----------------------------------------------------------------------------------------------
+//	RULES
+//----------------------------------------------------------------------------------------------
+{
+	menuDef 
+	{
+		name					"rulesMenu"
+		fullScreen				MENU_TRUE				
+		rect					0 0 640 480							// Size and position of the menu
+		visible					0					
+		focusColor				1 1 1 1								// Focus color for text and items
+		descX					375
+		descY					425
+		descScale				.8
+		descColor				.235 .882 .847 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+
+		onOpen 
+		{
+			hide				rulesheader ;
+			show				default_rulesheader ;
+
+			show				default_submenu ;
+			hide				force_submenu ;
+			hide				game_submenu ;
+			hide				weapon_submenu ; 
+			hide				item_submenu ;
+
+			hide				smallhighlight ;
+			hide				mainhighlight ;
+
+			hide				gamedesc ;
+			hide				setup_background ;
+
+			setcvar				"ui_rules_backout" 0 ;
+		}								
+
+		onESC 
+		{ 
+			hide				rulesheader ;
+			show				default_rulesheader ;
+
+			show				default_submenu ;
+			hide				force_submenu ;
+			hide				game_submenu ;
+			hide				weapon_submenu ; 
+			hide				item_submenu ;
+
+			hide				smallhighlight ;
+			hide				mainhighlight ;
+
+			hide				gamedesc ;
+			hide				setup_background ;
+
+			play				"sound/interface/button1.wav" ; 
+
+			defer				RulesBackout ;
+
+			close				rulesMenu ; 
+			open				main ;
+		}
+	
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	MENU BACKGROUND
+		//
+		//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				frame_pic
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+			background			"gfx/menus/menu1"					// Frame
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+
+		// The saber glow on the left
+		itemDef 
+		{
+			name				saberglow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				15 0 60 480
+			background			"gfx/menus/menu3"					// Frame
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+
+
+		// The red saber glow on the left
+		itemDef 
+		{
+			name				saberglowr
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				75 0 60 480
+			background			"gfx/menus/menu3r"					// Frame
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+
+
+		// The starwars logo on the top
+		itemDef 
+		{
+			name				starwars
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				143 12 470 93
+			background			"gfx/menus/menu4"					// Frame
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+
+		// The saber halo on the left
+		itemDef 
+		{
+			name				saberhalo
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				-255 -50 600 600
+			background			"gfx/menus/menu2"						// Frame
+			forecolor			0.7 0.7 0.7 1
+			visible			1
+			decoration
+		}
+
+		// The red saber halo on the left
+		itemDef 
+		{
+			name				saberhalor
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				-195 35 600 600
+			background			"gfx/menus/menu2r"						// Frame
+			forecolor			0.7 0.7 0.7 1
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				logomodel
+			group				none
+			type 				ITEM_TYPE_MODEL
+			rect				-78 83 250 250
+			model_angle			90
+			model_rotation		20
+			asset_model			"models/map_objects/bespin/jk2logo.md3"
+			model_fovx			45
+			model_fovy			45
+//			model_origin		100 100 100
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				logomodelr
+			group				none
+			type 				ITEM_TYPE_MODEL
+			rect				-19 167 250 250
+			model_angle			90
+			model_rotation		20
+			asset_model			"models/map_objects/bespin/jk2logo.md3"
+			model_fovx			45
+			model_fovy			45
+//			model_origin		100 100 100
+			visible			1
+			decoration
+		}
+
+		// The saber halo on the left, over the model
+		itemDef 
+		{
+			name				saberhalo2
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				-155 50 400 400
+			background			"gfx/menus/menu2b"					// Frame
+			forecolor			0.3 0.3 0.3 1
+			visible			1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				saberhalo2r
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				-95 135 400 400
+			background			"gfx/menus/menu2br"					// Frame
+			forecolor			0.3 0.3 0.3 1
+			visible			1
+			decoration
+		}
+
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	TOP MENU BUTTONS
+		//
+		//----------------------------------------------------------------------------------------------
+
+		// Big button "NEW"
+		itemDef 
+		{
+			name				newgamebutton_glow
+			group				mods
+			style				WINDOW_STYLE_SHADER
+			rect				115 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				newgamebutton
+			group				toprow
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				115 115 130 24
+			text				@MENUS2_PLAY
+			descText			@MENUS2_START_PLAYING_NOW
+			font				3
+			textscale			0.9
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			forecolor			0.65 0.65 1 1
+			visible			1
+
+			mouseEnter 
+			{ 
+				show			newgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			newgamebutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			multiplayermenu 
+			}
+		}
+
+		// Big button "LOAD"
+		itemDef 
+		{
+			name				loadgamebutton_glow
+			group				mods
+			style				WINDOW_STYLE_SHADER
+			rect				245 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				loadgamebutton
+			group				toprow
+			text				@MENUS0_RULES
+			descText			@MENUS0_GAME_DESCRIPTIONS
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				245 115 130 24
+			textaligny			0
+			font				3
+			textscale			0.9
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			forecolor			1 1 1 1
+			visible				1
+
+			mouseEnter 
+			{ 
+				show			loadgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			loadgamebutton_glow 
+			}
+			action
+			{
+				play			"sound/interface/button1.wav" ; 
+				close			all ;
+				open			rulesMenu ;
+			}
+		}
+
+		// Big button "CONTROLS"
+		itemDef 
+		{
+			name				controlsbutton_glow
+			group				mods
+			style				WINDOW_STYLE_SHADER
+			rect				375 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef {
+			name				controlsbutton
+			group				toprow
+			text				@MENUS0_CONTROLS2
+			descText			@MENUS0_CONFIGURE_GAME_CONTROLS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				375 115 130 24
+			font				3
+			textscale			0.9
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			backcolor			0 0 0 0
+			forecolor			0.65 0.65 1 1
+			visible				1
+			 
+			mouseEnter 
+			{ 
+				show			controlsbutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			controlsbutton_glow 
+			}	  	  
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			controlsMenu ;
+			}
+		}
+
+		// Big button "SETUP"
+		itemDef 
+		{
+			name				setupbutton_glow
+			group				mods
+			style				WINDOW_STYLE_SHADER
+			rect				505 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef {
+			name				setupbutton
+			group				toprow
+			text				@MENUS0_SETUP
+			descText			@MENUS0_CONFIGURE_GAME_SETTINGS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				505 115 130 24
+			font				3
+			textscale			0.9
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			backcolor			0 0 0 0
+			forecolor			0.65 0.65 1 1
+			visible				1
+			 
+			mouseEnter 
+			{ 
+				show			setupbutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			setupbutton_glow 
+			}	  	  
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			setup_menu
+			}
+		}
+
+		itemDef 
+		{
+			name				header_line
+			group				toprow
+			style				WINDOW_STYLE_SHADER
+			rect				125 136 500 4
+			background			"gfx/menus/menu_line"					// Frame
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	OTHER MAIN MENU BUTTONS
+		//
+		//----------------------------------------------------------------------------------------------
+		// Credits hidden button
+		itemDef 
+		{
+			name				creditsbutton
+			group				othermain
+//			text				@CREDITS
+			descText			@MENUS0_SHOW_GAME_CREDITS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				17 221 118 141
+			font				2
+			textscale			1
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			46
+			backcolor			0 0 0 0
+			forecolor			0.65 0.65 1 1
+			visible				0
+
+			mouseEnter
+			{
+				setitemcolor		saberhalo2 	forecolor 	 0.7 0.7 0.7 1
+				setitemcolor		saberhalo2r forecolor 	 0.7 0.7 0.7 1
+			}		
+			mouseExit
+			{
+				setitemcolor		saberhalo2 	forecolor 	 0.3 0.3 0.3 1
+				setitemcolor		saberhalo2r forecolor 	 0.3 0.3 0.3 1
+			}		
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 	
+				close			all ; 
+				open			creditsMenu 
+			}
+		}
+
+		// EXIT button in lower left corner
+		itemDef 
+		{
+			name				exitgamebutton_glow
+			group				mods
+			style				WINDOW_STYLE_SHADER
+			rect				115 444 130 24 
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				exitgamebutton
+			group				othermain
+			text				@MENUS0_EXIT
+			descText			@MENUS0_LEAVE_JEDI_KNIGHT_II
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				115 444 130 24 
+			font				3
+			textscale			1
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			textaligny			-1
+			forecolor			0.65 0.65 1 1
+			visible			1
+
+			mouseEnter 
+			{ 
+				show			exitgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			exitgamebutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/weapons/saber/saberoff.mp3"; 
+				close			all ; 
+				open			quitMenu 
+			}
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	SECOND ROW MENU BUTTONS
+		//
+		//----------------------------------------------------------------------------------------------
+		// Setup Options title
+		itemDef 
+		{
+			name				default_rulesheader
+			group				rulesheader
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			text				@MENUS0_RULES
+      		rect				150 145 450 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			225
+			textaligny			-2	
+			forecolor			1 1 1 1
+      		visible				1 
+      		decoration 
+		}
+
+		itemDef 
+		{
+			name				game_rulesheader
+			group				rulesheader
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			text				@MENUS2_GAME_RULES
+      		rect				150 145 450 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			225
+			textaligny			-2	
+			forecolor			1 1 1 1
+      		visible				0
+      		decoration 
+		}
+
+		itemDef 
+		{
+			name				force_rulesheader
+			group				rulesheader
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			text				@MENUS2_FORCE_RULES
+      		rect				150 145 450 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			225
+			textaligny			-2	
+			forecolor			1 1 1 1
+      		visible				0
+      		decoration 
+		}
+
+		itemDef 
+		{
+			name				weapon_rulesheader
+			group				rulesheader
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			text				@MENUS2_WEAPON_RULES
+      		rect				150 145 450 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			225
+			textaligny			-2	
+			forecolor			1 1 1 1
+      		visible				0
+      		decoration 
+		}
+
+		itemDef 
+		{
+			name				item_rulesheader
+			group				rulesheader
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			text				@MENUS2_ITEM_RULES
+      		rect				150 145 450 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			225
+			textaligny			-2	
+			forecolor			1 1 1 1
+      		visible				0
+      		decoration 
+		}
+
+		// Main highlights
+		itemDef 
+		{
+			group				mainhighlight
+			name				mainhighlight1
+			style				WINDOW_STYLE_SHADER
+			rect				120 173 170 30
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				mainhighlight
+			name				mainhighlight2
+			style				WINDOW_STYLE_SHADER
+			rect				120 203 170 30
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				mainhighlight
+			name				mainhighlight3
+			style				WINDOW_STYLE_SHADER
+			rect				120 233 170 30
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				mainhighlight
+			name				mainhighlight4
+			style				WINDOW_STYLE_SHADER
+			rect				120 263 170 30
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		// Main small highlights
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight1
+			style				WINDOW_STYLE_SHADER
+			rect				120 173 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight2
+			style				WINDOW_STYLE_SHADER
+			rect				120 188 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight3
+			style				WINDOW_STYLE_SHADER
+			rect				120 203 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight4
+			style				WINDOW_STYLE_SHADER
+			rect				120 218 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight5
+			style				WINDOW_STYLE_SHADER
+			rect				120 233 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight6
+			style				WINDOW_STYLE_SHADER
+			rect				120 248 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight7
+			style				WINDOW_STYLE_SHADER
+			rect				120 263 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight8
+			style				WINDOW_STYLE_SHADER
+			rect				120 278 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight9
+			style				WINDOW_STYLE_SHADER
+			rect				120 293 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight10
+			style				WINDOW_STYLE_SHADER
+			rect				120 308 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight11
+			style				WINDOW_STYLE_SHADER
+			rect				120 323 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight12
+			style				WINDOW_STYLE_SHADER
+			rect				120 338 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight13
+			style				WINDOW_STYLE_SHADER
+			rect				120 353 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight14
+			style				WINDOW_STYLE_SHADER
+			rect				120 368 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			group				smallhighlight
+			name				smallhighlight15
+			style				WINDOW_STYLE_SHADER
+			rect				120 383 170 15
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name			gamesmenubutton_hover
+			group			mainhighlight
+			style			WINDOW_STYLE_SHADER
+			rect			275 210 200 30
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		// Games 
+		itemDef 
+		{
+			name			gamesmenubutton
+			group			default_submenu
+			text			@MENUS2_GAMES
+			descText		@MENUS2_GAME_RULES
+			type			ITEM_TYPE_BUTTON
+			style			WINDOW_STYLE_EMPTY
+			rect			275 210 200 30
+			font			2
+			textscale		1
+			textalign		ITEM_ALIGN_CENTER
+			textstyle		3
+			textalignx		100
+			textaligny		-2
+			forecolor		0.65 0.65 1 1
+			visible			1
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+
+				close			"rulesMenu" ;
+				open			"rulesMenu_games" ;
+			}
+			onFocus 
+			{ 
+				show		gamesmenubutton_hover
+			}
+			mouseEnter 
+			{ 
+				show		gamesmenubutton_hover
+			}
+			mouseExit 
+			{ 
+				hide		gamesmenubutton_hover
+			}	  	  
+		}
+
+		itemDef 
+		{
+			name			forcemenubutton_hover
+			group			mainhighlight
+			style			WINDOW_STYLE_SHADER
+			rect			275 250 200 30
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		// Games 
+		itemDef 
+		{
+			name			forcemenubutton
+			group			default_submenu
+			text			@MENUS1_FORCE_POWERS
+			descText		@MENUS2_FORCE_RULES
+			type			ITEM_TYPE_BUTTON
+			style			WINDOW_STYLE_EMPTY
+			rect			275 250 200 30
+			font			2
+			textscale		1
+			textalign		ITEM_ALIGN_CENTER
+			textstyle		3
+			textalignx		100
+			textaligny		-2
+			forecolor		0.65 0.65 1 1
+			visible			1
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+
+				close			"rulesMenu" ;
+				open			"rulesMenu_force" ;
+			}
+			onFocus 
+			{ 
+				show		forcemenubutton_hover
+			}
+			mouseEnter 
+			{ 
+				show		forcemenubutton_hover
+			}
+			mouseExit 
+			{ 
+				hide		forcemenubutton_hover
+			}	  	  
+		}
+
+
+		itemDef 
+		{
+			name			weaponmenubutton_hover
+			group			mainhighlight
+			style			WINDOW_STYLE_SHADER
+			rect			275 290 200 30
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		// Weapons 
+		itemDef 
+		{
+			name			weaponmenubutton
+			group			default_submenu
+			text			@MENUS0_WEAPONS
+			descText		@MENUS2_WEAPON_RULES
+			type			ITEM_TYPE_BUTTON
+			style			WINDOW_STYLE_EMPTY
+			rect			275 290 200 30
+			font			2
+			textscale		1
+			textalign		ITEM_ALIGN_CENTER
+			textstyle		3
+			textalignx		100
+			textaligny		-2
+			forecolor		0.65 0.65 1 1
+			visible			1
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+
+				close			"rulesMenu" ;
+				open			"rulesMenu_weapons" ;
+			}
+			onFocus 
+			{ 
+				show		weaponmenubutton_hover
+			}
+			mouseEnter 
+			{ 
+				show		weaponmenubutton_hover
+			}
+			mouseExit 
+			{ 
+				hide		weaponmenubutton_hover
+			}	  	  
+		}
+
+		itemDef 
+		{
+			name			itemmenubutton_hover
+			group			mainhighlight
+			style			WINDOW_STYLE_SHADER
+			rect			275 330 200 30
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		// Items 
+		itemDef 
+		{
+			name			weaponmenubutton
+			group			default_submenu
+			text			@MENUS2_ITEMS
+			descText		@MENUS2_ITEM_RULES
+			type			ITEM_TYPE_BUTTON
+			style			WINDOW_STYLE_EMPTY
+			rect			275 330 200 30
+			font			2
+			textscale		1
+			textalign		ITEM_ALIGN_CENTER
+			textstyle		3
+			textalignx		100
+			textaligny		-2
+			forecolor		0.65 0.65 1 1
+			visible			1
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+
+				close			"rulesMenu" ;
+				open			"rulesMenu_items" ;
+			}
+			onFocus 
+			{ 
+				show		itemmenubutton_hover
+			}
+			mouseEnter 
+			{ 
+				show		itemmenubutton_hover
+			}
+			mouseExit 
+			{ 
+				hide		itemmenubutton_hover
+			}	  	  
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

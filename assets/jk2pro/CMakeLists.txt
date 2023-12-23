@@ -59,10 +59,31 @@ set(AssetsFiles
 	"sound/chars/tavion/misc/jump1.mp3"
 	"sound/common/warning.wav"
 
-	"ui/jk2mp/ingame.menu"
-	"ui/jk2mp/ingame_camera.menu"
-	"ui/jk2mp/ingame_server.menu"
+	"strip/menus_jka.sp"
+
 	"ui/jk2mpingame.txt"
+
+	"ui/jk2mp/controls.menu"
+	"ui/jk2mp/credits.menu"
+	"ui/jk2mp/demo.menu"
+	"ui/jk2mp/ingame.menu"
+	"ui/jk2mp/ingame_callvote.menu"
+	"ui/jk2mp/ingame_camera.menu"
+	"ui/jk2mp/ingame_player.menu"
+	"ui/jk2mp/ingame_player2.menu"
+	"ui/jk2mp/ingame_playerforce.menu"
+	"ui/jk2mp/ingame_saber.menu"
+	"ui/jk2mp/main.menu"
+	"ui/jk2mp/multiplayer.menu"
+	"ui/jk2mp/quit.menu"
+	"ui/jk2mp/rules.menu"
+	"ui/jk2mp/rules_force.menu"
+	"ui/jk2mp/rules_games.menu"
+	"ui/jk2mp/rules_items.menu"
+	"ui/jk2mp/rules_weapons.menu"
+	"ui/jk2mp/setup.menu"
+
+	"ui/jk2mp/menudef.h"
 )
 
 source_group("jk2pro-assets" FILES ${AssetsFiles})

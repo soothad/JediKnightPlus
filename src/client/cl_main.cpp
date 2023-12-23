@@ -3187,10 +3187,14 @@ void CL_Init( void ) {
 	Cvar_Get ("password", "", CVAR_USERINFO);
 	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
 
+	// default sabers
+	Cvar_Get("saber1", "Kyle", CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("saber2", "none", CVAR_ARCHIVE | CVAR_GLOBAL);
+
 	// skin color
-	Cvar_Get("char_color_red", "255", CVAR_ARCHIVE | CVAR_USERINFO | CVAR_GLOBAL);
-	Cvar_Get("char_color_green", "255", CVAR_ARCHIVE | CVAR_USERINFO | CVAR_GLOBAL);
-	Cvar_Get("char_color_blue", "255", CVAR_ARCHIVE | CVAR_USERINFO | CVAR_GLOBAL);
+	Cvar_Get("char_color_red", "255", CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("char_color_green", "255", CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("char_color_blue", "255", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	// cgame might not be initialized before menu is used
 	Cvar_Get ("cg_viewsize", "100", CVAR_ARCHIVE );

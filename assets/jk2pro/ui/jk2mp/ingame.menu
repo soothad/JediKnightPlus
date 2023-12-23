@@ -6,8 +6,9 @@
 	{
 		font					"ergoec" 18				// font
 		smallFont				"ocr_a" 18				// font
-		bigFont				"anewhope" 20			// font
-		cursor				"cursor"				// cursor	
+		bigFont					"anewhope" 20			// font
+		small2Font				"arialnb" 14
+		cursor					"cursor"				// cursor	
 		gradientBar				"ui/assets/gradientbar2.tga"	// gradient bar
 		itemFocusSound			"sound/interface/menuroam.wav"		// sound for item getting focus (via keyboard or mouse )
 
@@ -16,8 +17,9 @@
 		fadeAmount				0.1					// amount to adjust alpha per cycle
 
 		shadowColor				0.1 0.1 0.1 0.25			// shadow color
+		stripedFile				"menus_jka"
 	}
-
+							   
 	menuDef 
 	{
 		name					"ingame"
@@ -34,6 +36,18 @@
 			group				none
 			style				WINDOW_STYLE_SHADER
 			rect				0 0 640 32
+			background			"gfx/menus/menu_top_mp"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				background_pic_bottom
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				190 464 260 16
 			background			"gfx/menus/menu_top_mp"
 			forecolor			1 1 1 1
 			visible				1
@@ -447,65 +461,7 @@
 			{ 
 				hide			leaveButton
 			}
-		}
-
-//-------------------------------------------
-// Bottom Bar
-//-------------------------------------------
-		itemDef 
-		{
-			name				background_pic_bottom
-			group				none
-			style				WINDOW_STYLE_SHADER
-			rect				190 464 260 16
-			background			"gfx/menus/menu_top_mp"
-			forecolor			1 1 1 1
-			visible				1
-			decoration
-		}
-
-		/*itemDef 
-		{
-			name				spectatorButton
-			group				none
-			style				WINDOW_STYLE_SHADER
-			rect				295 448 50 16
-			background			"gfx/menus/menu_buttonback"			// Frame around button
-			forecolor			1 1 1 1
-			decoration
-			visible				0
-		}
-
-		itemDef 
-		{
-			name				spectator
-			text				"Spec"
-			type				1
-			style				WINDOW_STYLE_FILLED
-			rect				295 448 50 16
-			font				2
-			textscale			.7
-			textstyle			3
-			textalign			ITEM_ALIGN_CENTER
-			textalignx		 	25
-			textaligny			-2
-			forecolor			1 1 1 1
-			backcolor			0 0 0 0
-			visible				1
-			action 
-			{ 
-				play			"sound/interface/button1.wav" ;
-				open			spectatormenu
-			} 
-			mouseenter 
-			{ 
-				show			spectatorButton
-			}
-			mouseexit 
-			{ 
-				hide			spectatorButton
-			}
-		}*/
+		} 
 
 		itemDef 
 		{
@@ -530,7 +486,7 @@
 			textscale			.7
 			textstyle			3
 			textalign			ITEM_ALIGN_CENTER
-			textalignx		 	25
+			textalignx		  25
 			textaligny			-2
 			forecolor			1 1 1 1
 			backcolor			0 0 0 0
@@ -538,7 +494,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				open			japroBrowserMenu
+				open			joinserver
 			}
 			mouseenter 
 			{ 
@@ -549,51 +505,6 @@
 				hide			browserButton
 			}
 		}
-		
-		/*itemDef 
-		{
-			name				raceButton
-			//group				none
-			style				WINDOW_STYLE_SHADER
-			rect				345 464 50 16
-			background			"gfx/menus/menu_buttonback"			// Frame around button
-			forecolor			1 1 1 1
-			decoration
-			visible			0
-		}
-		
-		itemDef 
-		{
-			name				race
-			text				"Race"
-			type				1
-			style				WINDOW_STYLE_FILLED
-			rect				345 464 50 16
-			font				2
-			textscale			.7
-			textstyle			3
-			textalign			ITEM_ALIGN_CENTER
-			textalignx		  25
-			textaligny			-2
-			forecolor			1 1 1 1
-			backcolor			0 0 0 0
-			cvarTest			"ui_raceMode"
-			showCvar			{ "1" }
-			visible				1
-			action 
-			{ 
-				play			"sound/interface/button1.wav" ;
-				open			racemenu
-			}
-			mouseenter 
-			{ 
-				show			raceButton
-			}
-			mouseexit 
-			{ 
-				hide			raceButton
-			}
-		}*/
 
 		itemDef 
 		{
@@ -637,93 +548,5 @@
 				hide			cameraButton
 			}
 		}
-		
-		/*itemDef 
-		{
-			name				strafeHelperButton
-			group				none
-			style				WINDOW_STYLE_SHADER
-			rect				242 464 50 46
-			background			"gfx/menus/menu_buttonback"			// Frame around button
-			forecolor			1 1 1 1
-			decoration
-			visible			0
-		}
-
-		itemDef 
-		{
-			name				strafeHelper
-			text				"Strafe H."
-			type				1
-			style				WINDOW_STYLE_FILLED
-			rect				242 464 50 16
-			font				2
-			textscale			.7
-			textstyle			3
-			textalign			ITEM_ALIGN_CENTER
-			textalignx		 	25
-			textaligny			-2
-			forecolor			1 1 1 1
-			backcolor			0 0 0 0
-			cvarTest			"ui_raceMode"
-			showCvar			{ 1 }
-			visible				1
-			action 
-			{ 
-				play			"sound/interface/button1.wav" ;
-				open			strafehelpermenu
-			} 
-			mouseenter 
-			{ 
-				show			strafeHelperButton
-			}
-			mouseexit 
-			{ 
-				hide			strafeHelperButton
-			}
-		}
-		
-		itemDef 
-		{
-			name				accountButton
-			group				none
-			style				WINDOW_STYLE_SHADER
-			rect				295 464 50 16
-			background			"gfx/menus/menu_buttonback"			// Frame around button
-			forecolor			1 1 1 1
-			decoration
-			visible			0
-		}
-		
-		itemDef 
-		{
-			name				account
-			text				"Account"
-			type				1
-			style				WINDOW_STYLE_FILLED
-			rect				295 464 50 16
-			font				2
-			textscale			.7
-			textstyle			3
-			textalign			ITEM_ALIGN_CENTER
-			textalignx		 	25
-			textaligny			-2
-			forecolor			1 1 1 1
-			backcolor			0 0 0 0
-			visible				1
-			action 
-			{ 
-				play			"sound/interface/button1.wav" ;
-				open			accountmenu
-			} 
-			mouseenter 
-			{ 
-				show			accountButton
-			}
-			mouseexit 
-			{ 
-				hide			accountButton
-			}
-		}*/
 	}
 }
