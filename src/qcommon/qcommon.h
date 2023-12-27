@@ -390,6 +390,7 @@ int VM_MVMenuLevel(const vm_t *vm);
 
 mvversion_t VM_GetGameversion(const vm_t *vm);
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion);
+vmInterpret_t VM_GetState(vm_t *vm);
 
 /*
 ==============================================================
@@ -909,6 +910,7 @@ int   Z_MemSize	( memtag_t eTag );
 void  Z_TagFree	( memtag_t eTag );
 void  Z_Free	( void *ptr );
 int	  Z_Size	( void *pvAddress);
+void *Z_Realloc(void *pvAddress, int iNewSize, qboolean bZeroit);
 void Com_ShutdownZoneMemory(void);
 
 void Hunk_Clear( void );

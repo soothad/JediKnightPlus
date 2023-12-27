@@ -1341,3 +1341,19 @@ mvversion_t VM_GetGameversion(const vm_t *vm) {
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion) {
 	vm->gameversion = gameversion;
 }
+
+vmInterpret_t VM_GetState(vm_t *vm)
+{
+	if (vm->dllHandle)
+	{
+		return VMI_NATIVE;
+	}
+	else if (vm->compiled)
+	{
+		return VMI_COMPILED;
+	}
+	else
+	{
+		return VMI_BYTECODE;
+	}
+}

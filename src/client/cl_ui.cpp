@@ -1335,6 +1335,66 @@ Ghoul2 Insert Start
 /*
 Ghoul2 Insert End
 */
+	case UI_Z_MALLOC:
+	{
+		if (VM_GetState(uivm) == VMI_NATIVE)
+		{
+			return (intptr_t) Z_Malloc((int) args[1], (memtag_t) args[2], (qboolean) args[3]);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	case UI_Z_MEMSIZE:
+	{
+		if (VM_GetState(uivm) == VMI_NATIVE)
+		{
+			return (intptr_t) Z_MemSize((memtag_t) args[1]);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	case UI_Z_TAGFREE:
+	{
+		if (VM_GetState(uivm) == VMI_NATIVE)
+		{
+			Z_TagFree((memtag_t) args[1]);
+		}
+		return 0;
+	}
+	case UI_Z_FREE:
+	{
+		if (VM_GetState(uivm) == VMI_NATIVE)
+		{
+			Z_Free((void *) args[1]);
+		}
+		return 0;
+	}
+	case UI_Z_SIZE:
+	{
+		if (VM_GetState(uivm) == VMI_NATIVE)
+		{
+			return Z_Size((void *) args[1]);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	case UI_Z_REALLOC:
+	{
+		if (VM_GetState(uivm) == VMI_NATIVE)
+		{
+			return (intptr_t) Z_Realloc((void *) args[1], (int) args[2], (qboolean) args[3]);
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(uivm);
@@ -1395,6 +1455,7 @@ void CL_ShutdownUI( void ) {
 		return;
 	}
 	VM_Call( uivm, UI_SHUTDOWN );
+	Z_TagFree(TAG_UI);
 	VM_Free( uivm );
 	uivm = NULL;
 }
