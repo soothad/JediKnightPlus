@@ -71,7 +71,7 @@ void R_CheckMP3s( const char *psDir )
 	const char	**sysFiles, **dirFiles;
 	int			numSysFiles, i, numdirs;
 
-	dirFiles = FS_ListFiles( psDir, "/", &numdirs);
+	dirFiles = FS_ListFiles2( psDir, "/", &numdirs);
 	if (numdirs > 2)
 	{
 		for (i=2;i<numdirs;i++)
@@ -82,7 +82,7 @@ void R_CheckMP3s( const char *psDir )
 		}
 	}
 
-	sysFiles = FS_ListFiles( psDir, ".mp3", &numSysFiles );
+	sysFiles = FS_ListFiles2( psDir, ".mp3", &numSysFiles );
 	for(i=0; i<numSysFiles; i++)
 	{
 		char	sFilename[MAX_QPATH];

@@ -2402,7 +2402,7 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 		return FS_GetModList(listbuf, bufsize);
 	}
 
-	pFiles = FS_ListFiles(path, extension, &nFiles);
+	pFiles = FS_ListFiles2(path, extension, &nFiles);
 
 	for (i =0; i < nFiles; i++) {
 		nLen = (int)strlen(pFiles[i]) + 1;
