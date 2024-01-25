@@ -253,7 +253,7 @@ CL_KeyState
 Returns the fraction of the frame that the key was down
 ===============
 */
-float CL_KeyState( kbutton_t *key ) {
+float CL_KeyState( kbutton_t *key, qboolean temporaryViewAnglesOnly ) {
 	float		val;
 	int			msec;
 
@@ -267,7 +267,7 @@ float CL_KeyState( kbutton_t *key ) {
 		} else {
 			msec += com_frameTime - key->downtime;
 		}
-		if (!cl_idrive->integer)
+		if (!cl_idrive->integer && !temporaryViewAnglesOnly)
 			key->downtime = com_frameTime;//Loda - Not sure what the fuck this is doing here, downtime is supposed to store time of when the key was initially pressed, not the most recent time its been held down..
 	}
 
@@ -402,7 +402,7 @@ CL_AdjustAngles
 Moves the local angle positions
 ================
 */
-void CL_AdjustAngles( void ) {
+void CL_AdjustAngles( qboolean temporaryViewAnglesOnly ) {
 	float	speed;
 
 	if ( in_speed.active ) {
@@ -412,12 +412,12 @@ void CL_AdjustAngles( void ) {
 	}
 
 	if ( !in_strafe.active ) {
-		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right);
-		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left);
+		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right, temporaryViewAnglesOnly);
+		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left, temporaryViewAnglesOnly);
 	}
 
-	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
-	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
+	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup, temporaryViewAnglesOnly);
+	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown, temporaryViewAnglesOnly);
 }
 
 /*
@@ -450,8 +450,8 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	up = 0;
 
 	if (in_strafe.active) {
-		s1 = CL_KeyState(&in_right);
-		s2 = CL_KeyState(&in_left);
+		s1 = CL_KeyState(&in_right, qfalse);
+		s2 = CL_KeyState(&in_left, qfalse);
 		if (cl_idrive->integer && cl_idrive->integer != 2) {
 			if (s1 && s2) {
 				if (in_right.downtime > in_left.downtime)
@@ -464,8 +464,8 @@ void CL_KeyMove( usercmd_t *cmd ) {
 		side -= movespeed * s2;
 	}
 
-	s1 = CL_KeyState(&in_moveright);
-	s2 = CL_KeyState(&in_moveleft);
+	s1 = CL_KeyState(&in_moveright, qfalse);
+	s2 = CL_KeyState(&in_moveleft, qfalse);
 	if (cl_idrive->integer && cl_idrive->integer != 2) {
 		if (s1 && s2) {
 			if (in_moveright.downtime > in_moveleft.downtime)
@@ -477,8 +477,8 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	side += movespeed * s1;
 	side -= movespeed * s2;
 
-	s1 = CL_KeyState (&in_up);
-	s2 = CL_KeyState (&in_down);
+	s1 = CL_KeyState (&in_up, qfalse);
+	s2 = CL_KeyState (&in_down, qfalse);
 	if (cl_idrive->integer || cl_idrive->integer == 2) {
 		if (s1 && s2) {
 			if (in_up.downtime > in_down.downtime)
@@ -490,8 +490,8 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	up += movespeed * s1;
 	up -= movespeed * s2;
 
-	s1 = CL_KeyState (&in_forward);
-	s2 = CL_KeyState (&in_back);
+	s1 = CL_KeyState (&in_forward, qfalse);
+	s2 = CL_KeyState (&in_back, qfalse);
 	if (cl_idrive->integer && cl_idrive->integer != 2) {
 		if (s1 && s2) {
 			if (in_forward.downtime > in_back.downtime)
@@ -580,7 +580,7 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 CL_MouseMove
 =================
 */
-void CL_MouseMove( usercmd_t *cmd ) {
+void CL_MouseMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly ) {
 	float	mx, my;
 	float	accelSensitivity;
 	float	rate;
@@ -593,9 +593,12 @@ void CL_MouseMove( usercmd_t *cmd ) {
 		mx = cl.mouseDx[cl.mouseIndex];
 		my = cl.mouseDy[cl.mouseIndex];
 	}
-	cl.mouseIndex ^= 1;
-	cl.mouseDx[cl.mouseIndex] = 0;
-	cl.mouseDy[cl.mouseIndex] = 0;
+
+	if (!temporaryViewAnglesOnly) {
+		cl.mouseIndex ^= 1;
+		cl.mouseDx[cl.mouseIndex] = 0;
+		cl.mouseDy[cl.mouseIndex] = 0;
+	}
 
 	rate = sqrtf( mx * mx + my * my ) / frame_msec;
 	accelSensitivity = cl_sensitivity->value + rate * cl_mouseAccel->value;
@@ -676,16 +679,17 @@ void CL_CmdButtons( usercmd_t *cmd ) {
 CL_FinishMove
 ==============
 */
-void CL_FinishMove( usercmd_t *cmd ) {
+void CL_FinishMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly ) {
 	int		i;
 	qboolean didForce = qfalse;
+	float oldLastViewYaw;
 
 	// copy the state that the cgame is currently sending
 	cmd->weapon = cl.cgameUserCmdValue;
 	cmd->forcesel = cl.cgameForceSelection;
 	cmd->invensel = cl.cgameInvenSelection;
 
-	if (cl.gcmdSendValue)
+	if (cl.gcmdSendValue && !temporaryViewAnglesOnly)
 	{
 		cmd->generic_cmd = cl.gcmdValue;
 		cl.gcmdSendValue = qfalse;
@@ -701,13 +705,22 @@ void CL_FinishMove( usercmd_t *cmd ) {
 
 	if (cl.cgameViewAngleForceTime > cl.serverTime)
 	{
-		cl.cgameViewAngleForce[YAW] -= SHORT2ANGLE(cl.snap.ps.delta_angles[YAW]);
+		if (temporaryViewAnglesOnly)
+		{
+			cl.viewangles[YAW] = cl.cgameViewAngleForce[YAW] - SHORT2ANGLE(cl.snap.ps.delta_angles[YAW]);
+		}
+		else
+		{
+			cl.cgameViewAngleForce[YAW] -= SHORT2ANGLE(cl.snap.ps.delta_angles[YAW]);
 
-		cl.viewangles[YAW] = cl.cgameViewAngleForce[YAW];
-		cl.cgameViewAngleForceTime = 0;
+			cl.viewangles[YAW] = cl.cgameViewAngleForce[YAW];
+			cl.cgameViewAngleForceTime = 0;
+		}
 
 		didForce = qtrue;
 	}
+
+	oldLastViewYaw = cl.lastViewYaw;
 
 	if (cl.viewangles[YAW] < 0)
 	{
@@ -764,10 +777,15 @@ void CL_FinishMove( usercmd_t *cmd ) {
 			cl.viewangles[YAW] = cl.lastViewYaw;
 		}
 
-		cl.cgameTurnExtentTime = 0;
+		if (!temporaryViewAnglesOnly) cl.cgameTurnExtentTime = 0;
 	}
 
 	cl.lastViewYaw = cl.viewangles[YAW];
+
+	if (temporaryViewAnglesOnly)
+	{
+		cl.lastViewYaw = oldLastViewYaw;
+	}
 
 	for (i=0 ; i<3 ; i++) {
 		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
@@ -780,24 +798,26 @@ void CL_FinishMove( usercmd_t *cmd ) {
 CL_CreateCmd
 =================
 */
-usercmd_t CL_CreateCmd( void ) {
+usercmd_t CL_CreateCmd(qboolean temporaryViewAnglesOnly) {
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
 
 	VectorCopy( cl.viewangles, oldAngles );
 
 	// keyboard angle adjustment
-	CL_AdjustAngles ();
+	CL_AdjustAngles(temporaryViewAnglesOnly);
 
 	Com_Memset( &cmd, 0, sizeof( cmd ) );
 
-	CL_CmdButtons( &cmd );
+	if (!temporaryViewAnglesOnly) {
+		CL_CmdButtons( &cmd );
 
-	// get basic movement from keyboard
-	CL_KeyMove( &cmd );
+		// get basic movement from keyboard
+		CL_KeyMove( &cmd );
+	}
 
 	// get basic movement from mouse
-	CL_MouseMove( &cmd );
+	CL_MouseMove(&cmd, temporaryViewAnglesOnly);
 
 	// get basic movement from joystick
 	CL_JoystickMove( &cmd );
@@ -810,16 +830,21 @@ usercmd_t CL_CreateCmd( void ) {
 	}
 
 	// store out the final values
-	CL_FinishMove( &cmd );
+	CL_FinishMove(&cmd, temporaryViewAnglesOnly);
 
 	// draw debug graphs of turning for mouse testing
-	if ( cl_debugMove->integer ) {
+	if (!temporaryViewAnglesOnly && cl_debugMove->integer) {
 		if ( cl_debugMove->integer == 1 ) {
 			SCR_DebugGraph( abs((int)(cl.viewangles[YAW] - oldAngles[YAW])), 0 );
 		}
 		if ( cl_debugMove->integer == 2 ) {
 			SCR_DebugGraph( abs((int)(cl.viewangles[PITCH] - oldAngles[PITCH])), 0 );
 		}
+	}
+
+	if (temporaryViewAnglesOnly) {
+		// Just doing a temporary cmd for view angles, restore everything to old state.
+		VectorCopy(oldAngles, cl.viewangles);
 	}
 
 	return cmd;
@@ -837,6 +862,8 @@ void CL_CreateNewCommands( void ) {
 	usercmd_t	*cmd;
 	int			cmdNum;
 
+	cl.newCmdsGenerated = qfalse;
+
 	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
 
 	// no need to create usercmds until we have a gamestate
@@ -844,27 +871,80 @@ void CL_CreateNewCommands( void ) {
 		return;
 	}
 
-	frame_msec = com_frameTime - old_com_frameTime;
+	int desiredPhysicsMsec = (MAX(1, MIN(200, 1000 / MAX(1,com_physicsFps->integer))));
+	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime) < (desiredPhysicsMsec* (MAX_PACKET_USERCMDS-cl_packetdup->integer))) { // TODO: Double check that last condition, I just pulled that out real quick without thinking about it too much
+		int oldCmdServerTime = cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime;
+		int serverTimeDelta = cl.serverTime - oldCmdServerTime;
+		int frameCount = serverTimeDelta / desiredPhysicsMsec;
 
-	// if running over 1000fps, act as if each frame is 1ms
-	// prevents division by zero
-	if ( frame_msec < 1 ) {
-		frame_msec = 1;
+		// Not sure if this whole frame_msec part should be outside the if(frameCount) condition or inside...
+		frame_msec = com_frameTime - old_com_frameTime;
+
+		// if running over 1000fps, act as if each frame is 1ms
+		// prevents division by zero
+		if (frame_msec < 1) {
+			frame_msec = 1;
+		}
+
+		// if running less than 5fps, truncate the extra time to prevent
+		// unexpected moves after a hitch
+		if (frame_msec > 200) {
+			frame_msec = 200;
+		}
+
+		if (frameCount) {
+			old_com_frameTime = com_frameTime;
+
+			int genericCommandValue = 0;
+			if (cl.gcmdSendValue) {
+				// Gotta intercept them earlier as they are only to be sent once but we might be duplicating our command to create multiple ones.
+				genericCommandValue = cl.gcmdValue;
+				cl.gcmdSendValue = qfalse;
+			}
+			usercmd_t newCommand = CL_CreateCmd(qfalse);
+
+			int newClServerTime = oldCmdServerTime + desiredPhysicsMsec;
+			for (int i = 0; i < frameCount; i++) {
+				// duplicate the command a few times until we are close to cl.serverTime.
+				cl.cmdNumber++;
+				cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+				newCommand.serverTime = newClServerTime;
+				newCommand.generic_cmd = genericCommandValue;
+				genericCommandValue = 0;
+				cl.temporaryCmd = cl.cmds[cmdNum] = newCommand;
+				cl.newCmdsGenerated = qtrue;
+				cmd = &cl.cmds[cmdNum];
+				newClServerTime += desiredPhysicsMsec;
+			}
+		} else {
+			// Create a temporary one we won't send, just for view angles
+			cl.temporaryCmd = CL_CreateCmd(qtrue);
+		}
+	} else {
+		frame_msec = com_frameTime - old_com_frameTime;
+
+		// if running over 1000fps, act as if each frame is 1ms
+		// prevents division by zero
+		if ( frame_msec < 1 ) {
+			frame_msec = 1;
+		}
+
+		// if running less than 5fps, truncate the extra time to prevent
+		// unexpected moves after a hitch
+		if ( frame_msec > 200 ) {
+			frame_msec = 200;
+		}
+		old_com_frameTime = com_frameTime;
+
+
+		// generate a command for this frame
+		cl.cmdNumber++;
+		cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+		cl.cmds[cmdNum] = CL_CreateCmd(qfalse);
+		cl.temporaryCmd = cl.cmds[cmdNum];
+		cl.newCmdsGenerated = qtrue;
+		cmd = &cl.cmds[cmdNum];
 	}
-
-	// if running less than 5fps, truncate the extra time to prevent
-	// unexpected moves after a hitch
-	if ( frame_msec > 200 ) {
-		frame_msec = 200;
-	}
-	old_com_frameTime = com_frameTime;
-
-
-	// generate a command for this frame
-	cl.cmdNumber++;
-	cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
-	cl.cmds[cmdNum] = CL_CreateCmd ();
-	cmd = &cl.cmds[cmdNum];
 }
 
 /*
@@ -881,6 +961,12 @@ getting more delta compression will reduce total bandwidth.
 qboolean CL_ReadyToSendPacket( void ) {
 	int		oldPacketNum;
 	int		delta;
+
+	if (!cl.newCmdsGenerated && cls.state >= CA_PRIMED) {
+		// When using com_physicsFps we may/will not generate new commands on every frame.
+		// If no new ones were generated, don't send a packet
+		return qfalse;
+	}
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {

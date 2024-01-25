@@ -78,6 +78,11 @@ qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return qtrue;
 }
 
+void CL_GetTemporaryUserCommand(usercmd_t *ucmd)
+{
+	*ucmd = cl.temporaryCmd;
+}
+
 int CL_GetCurrentCmdNumber( void ) {
 	return cl.cmdNumber;
 }
@@ -1442,6 +1447,10 @@ Ghoul2 Insert End
 
 		return G2API_SkinlessModel( ghoul2, modelIndex );
 	}
+
+	case CG_GET_TEMPORARY_USER_COMMAND:
+		CL_GetTemporaryUserCommand(VMAV(1, usercmd_t));
+		return 0;
 
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);

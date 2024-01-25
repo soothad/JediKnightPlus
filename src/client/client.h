@@ -125,8 +125,10 @@ typedef struct {
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
 	// properly generated command
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
+	usercmd_t	temporaryCmd;		// temporary cmd when using com_physicsFps to have up to date view angles.
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
+	qboolean	newCmdsGenerated;	// For com_physicsfps. Let us know whether new cmds were generated on this frame. If not, don't send out new packets.
 
 	outPacket_t	outPackets[PACKET_BACKUP];	// information about each packet we have sent out
 
@@ -541,7 +543,7 @@ void IN_CenterView (void);
 
 void CL_VerifyCode( void );
 
-float CL_KeyState (kbutton_t *key);
+float CL_KeyState (kbutton_t *key, qboolean temporaryViewAnglesOnly);
 const char *Key_KeynumToString( int keynum/*, qboolean bTranslate */ ); //note: translate is only called for menu display not configs
 
 int Key_GetProtocolKey15(mvversion_t protocol, int key15);

@@ -2224,3 +2224,5 @@ extern void *g2WeaponInstances[MAX_WEAPONS];
 /*
 Ghoul2 Insert End
 */
+
+void trap_GetTemporaryUserCommand(usercmd_t *ucmd);
