@@ -25,6 +25,9 @@ set(AssetsFiles
 	"gfx/hud/keys/right_off.tga"
 	"gfx/hud/keys/right_on.tga"
 
+	"gfx/misc/tcRenderShader.jpg"
+	"gfx/misc/tcRenderShader2.jpg"
+
 	"icons/iconf_neutral1.tga"
 	"icons/iconf_neutral1_x.tga"
 
@@ -49,6 +52,7 @@ set(AssetsFiles
 
 	"shaders/ctf3_yellowteam.shader"
 	"shaders/q3mod.shader"
+	"shaders/tcRenderShader.shader"
 
 	"sound/chars/mothma/misc/40MOM017.mp3"
 	"sound/chars/mothma/misc/40MOM019.mp3"

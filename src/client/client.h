@@ -673,6 +673,12 @@ extern void demoAutoRecord(void);
 extern void demoAutoInit(void);
 
 //
+// cl_tc_vis.cpp
+//
+void tc_vis_init(void);
+void tc_vis_render(void);
+
+//
 // cl_avi.c
 //
 qboolean CL_OpenAVIForWriting( const char *filename );

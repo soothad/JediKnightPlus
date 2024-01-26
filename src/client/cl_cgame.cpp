@@ -674,6 +674,8 @@ void CL_CM_LoadMap( const char *mapname ) {
 	if ( CM_NumInlineModels() > MAX_SUBMODELS && !cls.submodelBypass ) {
 		Com_Error( ERR_DROP, "MAX_SUBMODELS exceeded\n\nYour CGame module doesn't support\nthe submodel bypass." );
 	}
+
+	tc_vis_init();
 }
 
 /*

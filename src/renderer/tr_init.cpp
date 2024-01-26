@@ -1502,6 +1502,16 @@ void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
 	glconfigOut->displayScale = glConfig.displayScale;
 }
 
+static const cplane_t* RE_GetFrustum(void)
+{
+	return tr.viewParms.frustum;
+}
+
+static const vec_t* RE_GetViewPosition(void)
+{
+	return tr.viewParms.ori.origin;
+}
+
 #endif //!DEDICATED
 /*
 @@@@@@@@@@@@@@@@@@@@@
@@ -1582,6 +1592,8 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 
 	re.CaptureFrameRaw = RE_CaptureFrameRaw;
 	re.CaptureFrameJPEG = RE_CaptureFrameJPEG;
+	re.GetFrustum = RE_GetFrustum;
+	re.GetViewPosition = RE_GetViewPosition;
 #endif //!DEDICATED
 	return &re;
 }

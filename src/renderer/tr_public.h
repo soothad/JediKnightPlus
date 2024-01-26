@@ -102,6 +102,8 @@ typedef struct {
 
 	int (*CaptureFrameRaw)( byte *buffer, int bufSize, int padding );
 	int (*CaptureFrameJPEG)( byte *buffer, int bufSize, int quality );
+	const cplane_t* (*GetFrustum)(void);
+	const vec_t* (*GetViewPosition)(void);
 } refexport_t;
 
 //
