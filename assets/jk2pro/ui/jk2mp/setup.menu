@@ -3762,10 +3762,6 @@
 
 
 			horizontalscroll
-			action
-			{
-				play			"sound/interface/button1.wav" ; 
-			}
 			mouseenter 
 			{ 
 				setitemcolor headlist bordercolor .7 0 0 1 ; 

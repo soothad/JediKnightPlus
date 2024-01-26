@@ -216,10 +216,6 @@
 			visible				1
 			textaligny			-3
 			forecolor			1 .682 0 1
-			action 
-			{
-				play			"sound/interface/choose_color.wav"
-			}
 		}
 
 		itemDef 
@@ -285,10 +281,6 @@
 			mouseExit 
 			{ 
 				hide			rgbred_glow
-			}	
-			action 
-			{ 
-				play			"sound/interface/button1"
 			}
 		}
 
@@ -317,10 +309,6 @@
 			mouseExit 
 			{ 
 				hide			rgbgreen_glow
-			}	
-			action 
-			{ 
-				play			"sound/interface/button1"
 			}
 		}
 
@@ -349,10 +337,6 @@
 			mouseExit 
 			{ 
 				hide			rgbblue_glow
-			}	
-			action 
-			{ 
-				play			"sound/interface/button1"
 			}
 		}
 
@@ -721,7 +705,6 @@
 			visible			1
 			action
 			{
-				play			"sound/interface/choose_head.wav"
 				uiScript 		"char_skin"
 			}
 		}
@@ -746,7 +729,6 @@
 			visible			0
 			action
 			{
-				play			"sound/interface/choose_torso.wav"
 				uiScript 		"char_skin"
 			}
 		}
@@ -771,7 +753,6 @@
 			visible			0
 			action
 			{
-				play			"sound/interface/choose_head.wav"
 				uiScript 		"char_skin"
 			}
 		}

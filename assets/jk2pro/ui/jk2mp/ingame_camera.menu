@@ -117,10 +117,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
 		}
 		
 		itemDef 
@@ -173,10 +169,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
 		}
 		
 		itemDef 
@@ -229,10 +221,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
 		}
 		
 		itemDef 
@@ -285,10 +273,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
 		}
 		
 		itemDef 
@@ -341,7 +325,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action				{ play "sound/interface/button1.wav" ; }
 		}
 		
 		itemDef 
@@ -394,7 +377,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action				{ play "sound/interface/button1.wav" ; }
 		}
 		
 		itemDef 
@@ -447,7 +429,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action				{ play "sound/interface/button1.wav" ; }
 		}
 		
 		itemDef 
@@ -500,7 +481,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action				{ play "sound/interface/button1.wav" ; }
 		}
 		
 		itemDef 
@@ -553,7 +533,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action				{ play "sound/interface/button1.wav" ; }
 		}
 		
 		itemDef 
@@ -605,7 +584,6 @@
 			textscale			1
 			forecolor			.615 .615 .956 1
 			visible				1
-			action				{ play "sound/interface/button1.wav" ; }
 		}
 		
 		itemDef 
