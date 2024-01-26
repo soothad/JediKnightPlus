@@ -208,12 +208,14 @@
 			elementtype			1 			//LISTBOX_IMAGE
 			feeder				FEEDER_COLORCHOICES
 			horizontalscroll
-			border			1
+			border				1
 			bordersize			1
 			backcolor			.66 .66 1 .25
 			bordercolor			.66 .66 1 1
 			rect				15 104 292 48
-			visible			1
+			visible				1
+			textaligny			-3
+			forecolor			1 .682 0 1
 			action 
 			{
 				play			"sound/interface/choose_color.wav"
@@ -714,7 +716,7 @@
 			bordersize			1
 			backcolor			.66 .66 1 .25
 			bordercolor			.66 .66 1 1
-			forecolor			-1			//use playercolor
+			forecolor			1 .682 0 1
 			rect				15 206 292 93
 			visible			1
 			action
@@ -739,7 +741,7 @@
 			bordersize			1
 			backcolor			.66 .66 1 .25
 			bordercolor			.66 .66 1 1
-			forecolor			-1			//use playercolor
+			forecolor			1 .682 0 1
 			rect				15 206 292 93
 			visible			0
 			action
@@ -764,7 +766,7 @@
 			bordersize			1
 			backcolor			.66 .66 1 .25
 			bordercolor			.66 .66 1 1
-			forecolor			-1			//use playercolor
+			forecolor			1 .682 0 1
 			rect				15 206 292 93
 			visible			0
 			action
