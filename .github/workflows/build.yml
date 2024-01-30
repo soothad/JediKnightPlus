@@ -3,9 +3,9 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: eternaljk2
+    branches: my_jk2mv
   pull_request:
-    branches: eternaljk2
+    branches: my_jk2mv
   release:
     types: [created]
 
