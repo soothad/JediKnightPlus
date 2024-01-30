@@ -326,8 +326,8 @@ typedef enum {
 	EXEC_APPEND			// add to end of the command buffer (normal case)
 } cbufExec_t;
 
-#define STR(x) #x
-#define XSTR(x) STR(x)
+#define Q_STR(x) #x
+#define Q_XSTR(x) Q_STR(x)
 
 #ifndef MIN
 #define MIN(x,y)	((x)<(y)?(x):(y))

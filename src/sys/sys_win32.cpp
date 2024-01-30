@@ -7,6 +7,7 @@
 #include <mv_setup.h>
 #include <signal.h>
 #include <string>
+#include <inttypes.h>
 #include "con_local.h"
 #include "../qcommon/vm_local.h"
 #include "../qcommon/q_shared.h"
@@ -135,6 +136,7 @@ static const char *GetErrorString( DWORD error ) {
 void Sys_SetProcessorAffinity( void ) {
 	DWORD_PTR processMask, processAffinityMask, systemAffinityMask;
 	HANDLE handle = GetCurrentProcess();
+	uintmax_t temp;
 
 	if (!com_affinity)
 		return;
@@ -142,8 +144,10 @@ void Sys_SetProcessorAffinity( void ) {
 	if ( !GetProcessAffinityMask( handle, &processAffinityMask, &systemAffinityMask ) )
 		return;
 
-	if ( sscanf( com_affinity->string, "%X", &processMask ) != 1 )
-		processMask = 1; // set to first core only
+	if ( sscanf( com_affinity->string, "%" PRIXMAX, &temp ) != 1 )
+		temp = 1; // set to first core only
+
+	processMask = (DWORD_PTR) temp;
 
 	if ( !processMask )
 		processMask = systemAffinityMask; // use all the cores available to the system

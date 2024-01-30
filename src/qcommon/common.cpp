@@ -2613,7 +2613,7 @@ void Com_Init( char *commandLine ) {
 	com_renderfps = Cvar_Get("com_renderfps", "0", CVAR_ARCHIVE);
 	cl_commandsize = Cvar_Get("cl_commandsize", "64", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
 
-	mv_apienabled = Cvar_Get("mv_apienabled", XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
+	mv_apienabled = Cvar_Get("mv_apienabled", Q_XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
 	com_timestamps = Cvar_Get("com_timestamps", "1", CVAR_ARCHIVE);
 
 	if ( com_dedicated->integer ) {
