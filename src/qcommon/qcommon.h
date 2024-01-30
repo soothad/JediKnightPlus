@@ -259,7 +259,7 @@ PROTOCOL
 
 #define	MAX_MASTER_SERVERS	8
 
-#define	UPDATE_SERVER_NAME	""//"update.jk2mv.org"
+#define	UPDATE_SERVER_NAME		"update.jk2mv.org"
 
 #define	PORT_MASTER			28060
 #define	PORT_UPDATE			28061
@@ -551,7 +551,7 @@ qboolean Cvar_Command( void );
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
 
-void Cvar_WriteVariables(fileHandle_t f);
+void Cvar_WriteVariables(fileHandle_t f, qboolean locals);
 // writes lines containing "set variable value" for all variables
 // with the archive flag set to true.
 

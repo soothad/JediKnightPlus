@@ -5,7 +5,7 @@
 #include "../renderer/tr_public.h"
 #include "sdl_icon.h"
 
-#define CLIENT_WINDOW_TITLE "EternalJK2"
+#define CLIENT_WINDOW_TITLE "JK2MV"
 
 enum rserr_t
 {

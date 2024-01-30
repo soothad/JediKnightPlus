@@ -178,7 +178,7 @@ if (BuildMVMP OR BuildMVDED)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_x86.cpp"
 		)
-	elseif(ARCH_ARM)
+	elseif(ARCH_ARM32)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_arm.cpp"
 		)
@@ -511,7 +511,7 @@ if (BuildMVMP)
 	set_target_properties(${MVMP} PROPERTIES CXX_STANDARD 11)
 	set_target_properties(${MVMP} PROPERTIES INCLUDE_DIRECTORIES "${MVMPIncludeDirs}")
 	target_link_libraries(${MVMP} ${MVMPLibraries} ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
-	set_target_properties(${MVMP} PROPERTIES PROJECT_LABEL "JK2MV MP Client")
+	set_target_properties(${MVMP} PROPERTIES PROJECT_LABEL "jk2mvmp")
 
 	# installation
 	if(MSVC)
@@ -547,10 +547,9 @@ if (BuildMVMP)
 
 	# jk2mvmenu and assetsmv are required to run JK2MV
 	add_dependencies(${MVMP} ${MVMENU} assetsmv)
-	add_dependencies(${MVMP} ${MVMENU} assets-jk2pro)
 
 	if(BuildMVSDK)
-		add_dependencies(${MVMP} bins-jk2pro)
+		add_dependencies(${MVMP} assetsmv2)
 		add_dependencies(${MVMP} ${MVGAME})
 		add_dependencies(${MVMP} ${MVCGAME})
 		add_dependencies(${MVMP} ${MVUI})
@@ -610,7 +609,7 @@ if (BuildMVMP)
 
 	set_target_properties(${MVMENU} PROPERTIES C_STANDARD 90)
 	set_target_properties(${MVMENU} PROPERTIES INCLUDE_DIRECTORIES "${MVMENUIncludeDirs}")
-	set_target_properties(${MVMENU} PROPERTIES PROJECT_LABEL "JK2MV MP UI")
+	set_target_properties(${MVMENU} PROPERTIES PROJECT_LABEL "jk2mvmenu")
 
 	if(BuildPortableVersion)
 		if(WIN32)
@@ -663,15 +662,15 @@ if (BuildMVDED)
 	set_target_properties(${MVDED} PROPERTIES CXX_STANDARD 11)
 	set_target_properties(${MVDED} PROPERTIES INCLUDE_DIRECTORIES "${MVDEDIncludeDirs}")
 	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
-	set_target_properties(${MVDED} PROPERTIES PROJECT_LABEL "JK2MV MP Dedicated Server")
+	set_target_properties(${MVDED} PROPERTIES PROJECT_LABEL "jk2mvded")
 
 	add_dependencies(${MVDED} assetsmv)
 
 	if(BuildMVSDK)
-		add_dependencies(${MVDED} bins-jk2pro)
-		add_dependencies(${MVMP} ${MVGAME})
-		add_dependencies(${MVMP} ${MVCGAME})
-		add_dependencies(${MVMP} ${MVUI})
+		add_dependencies(${MVDED} assetsmv2)
+		add_dependencies(${MVDED} ${MVGAME})
+		add_dependencies(${MVDED} ${MVCGAME})
+		add_dependencies(${MVDED} ${MVUI})
 	endif()
 
 	# installation

@@ -1,0 +1,2059 @@
+\\-------------------------------
+\\ Server Join 
+\\-------------------------------
+{
+	menuDef 
+	{
+		name					"japroBrowserMenu"
+		visible					0
+		//fullscreen				1
+		//rect					0 0 640 480
+		fullscreen				0
+		rect					0 38 640 405
+		outOfBoundsClick	
+		focusColor				1 1 1 1								// Focus color for text and items
+		descX					320
+		//descY					425
+		descY					395
+		descScale				.8
+		descColor				.235 .882 .847 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+
+		onOpen 
+		{ 
+			uiScript			UpdateFilter
+		}
+
+		/*onEsc 
+		{ 
+			uiScript			closeJoin
+			open				multiplayermenu
+		}*/
+
+		// Overall window backdrop
+		itemDef 
+		{
+			name				background_pic
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 405
+			background			"gfx/menus/menu_box_ingame"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		//---------------------------------------------
+		//	Top buttons
+		//---------------------------------------------
+		itemDef 
+		{
+			name				getnewlistButton
+			group				none
+			style			WINDOW_STYLE_SHADER
+			rect				16 4 180 30
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		itemDef 
+		{
+			name				getnewlistText
+			text				@MENUS0_GET_NEW_LIST
+			descText			@MENUS0_GET_UPDATED_SERVER_LIST
+			type				ITEM_TYPE_BUTTON
+			textscale			1
+			style				WINDOW_STYLE_FILLED
+			rect				16 4 180 30
+			textalign			1
+			textalignx			90								// center
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible 1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		RefreshServers 
+			}	  	  
+			mouseEnter 
+			{ 
+				show		getnewlistButton
+			}
+			mouseExit 
+			{ 
+				hide		getnewlistButton
+			}	  	  
+		}
+
+		itemDef 
+		{
+			name				refreshFilterButton
+			group				none
+			style			WINDOW_STYLE_SHADER
+			rect				16 33 180 30
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		itemDef 
+		{
+			name				refreshFilterText
+			text				@MENUS0_REFRESH_LIST
+			descText			@MENUS0_REFRESH_SERVER_LIST
+			textscale			1
+			style				WINDOW_STYLE_FILLED
+			type				ITEM_TYPE_BUTTON
+			rect				16 33 180 30
+			textalign			1
+			textalignx			90		// center
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		RefreshFilter 
+			}	  	  
+			mouseEnter 
+			{ 
+				show		refreshFilterButton
+			}
+			mouseExit 
+			{ 
+				hide		refreshFilterButton
+			}	  	  
+		}
+
+		//---------------------------------------------
+		//	Selectors (middle column top)
+		//---------------------------------------------
+		// Source selector
+		itemDef 
+		{
+			name				netsource_button
+			group				none
+			style			WINDOW_STYLE_SHADER
+			rect				250 4 200 24
+			background			"gfx/menus/menu_blendbox3"
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		itemDef 
+		{
+			name				netsource
+			style				0	
+//			text				@MENUS3_SOURCE
+			descText			@MENUS0_CHOOSE_SOURCE_OF_SERVERS
+			ownerdraw			UI_NETSOURCE
+			rect				250 4 200 24
+			font				2
+			textscale			0.8
+			textalignx			0
+			textaligny			-2
+			textalign			ITEM_ALIGN_LEFT
+			textstyle			3
+			forecolor			1 1 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;  
+			}
+			mouseenter 
+			{ 
+				show			netsource_button
+			}
+			mouseexit 
+			{ 
+				hide			netsource_button
+			} 
+		}
+
+		// Filter selector
+		itemDef 
+		{
+			name				netfilter_button
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				250 22 200 24
+			background			"gfx/menus/menu_blendbox3"
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		itemDef 
+		{
+			name				netfilter
+			style				0	
+//			text				@MENUS3_GAME
+//			descText			@MENUS0_SET_FILTER_FOR_SPECIFIC
+// ouned: botfilter
+			descText			@MV_GAME_VERSION_BROWSER_INFO
+			ownerdraw			UI_NETFILTER
+			rect				250 22 200 24
+			font				2
+			textscale			0.8
+			textalignx			0
+			textaligny			-2
+			textalign			ITEM_ALIGN_LEFT
+			textstyle			3
+			forecolor			1 1 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;  
+			}
+			mouseenter 
+			{ 
+				show			netfilter_button
+			}
+			mouseexit 
+			{ 
+				hide			netfilter_button
+			} 
+		}
+
+		// Game type selector
+		itemDef 
+		{
+			name				gametypefilter_button
+			group				none
+			style			WINDOW_STYLE_SHADER
+			rect				250 40 200 24
+			background			"gfx/menus/menu_blendbox3"
+			forecolor		1 1 1 1
+			decoration
+			visible		0 
+		}
+
+		itemDef 
+		{
+			name				gametypefilter
+			style				0	
+			text				@MENUS0_GAME_TYPE
+			descText			@MENUS0_FILTER_FOR_SPECIFIC_GAME
+			ownerdraw			UI_JOINGAMETYPE
+			rect				250 40 200 24
+			font				2
+			textscale			0.8
+			textalignx			0
+			textaligny			-2
+			textalign			ITEM_ALIGN_LEFT
+			textstyle			3
+			forecolor			1 1 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;  
+			}
+			mouseenter 
+			{ 
+				show			gametypefilter_button
+			}
+			mouseexit 
+			{ 
+				hide			gametypefilter_button
+			} 
+		}
+
+
+		//---------------------------------------------
+		//	Selectors (right column top)
+		//---------------------------------------------
+		// view empty selector
+		itemDef 
+		{
+			name				viewEmpty_button
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				460 4 150 24
+			background			"gfx/menus/menu_blendbox3"
+			forecolor			1 1 1 1
+			decoration
+			visible			0 
+		}
+
+		itemDef 
+		{
+			name				viewEmpty
+			type				ITEM_TYPE_YESNO
+			text				@MENUS0_VIEW_EMPTY
+			descText			@MENUS0_INCLUDE_EMPTY_SERVERS
+			cvar				"ui_browserShowEmpty"
+			textscale			.80
+			rect				460 4 150 24
+			textalign			0
+			textalignx			0
+			textaligny			-2
+			textalign			ITEM_ALIGN_LEFT
+			forecolor			1 1 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		RefreshFilter 
+			}
+			mouseenter 
+			{ 
+				show			viewEmpty_button
+			}
+			mouseexit 
+			{ 
+				hide			viewEmpty_button
+			} 
+		}
+
+		// View Full selector
+		itemDef 
+		{
+			name				viewFull_button
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				460 22 150 24
+			background			"gfx/menus/menu_blendbox3"
+			forecolor			1 1 1 1
+			decoration
+			visible			0 
+		}
+
+		itemDef 
+		{
+			name				viewFull
+			type				11
+			text				@MENUS0_VIEW_FULL
+			descText			@MENUS0_INCLUDE_FULL_SERVERS
+			cvar				"ui_browserShowFull"
+			textscale			.80
+			rect				460 22 150 24
+			textalign			0
+			textalignx			0
+			textaligny			-2
+			textalign			ITEM_ALIGN_LEFT
+			forecolor			1 1 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		RefreshFilter
+			}
+			mouseenter 
+			{ 
+				show			viewFull_button
+			}
+			mouseexit 
+			{ 
+				hide			viewFull_button
+			} 
+		}
+
+		// ouned: botfilter
+		itemDef
+		{
+			name				botfilter_button
+			group				none
+			style				WINDOW_STYLE_SHADER
+			//rect				460 72 150 24
+			rect				460 40 150 24
+			background			"gfx/menus/menu_blendbox3"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef
+		{
+			name				botfilter
+			type				ITEM_TYPE_MULTI
+			text				@MV_BOTFILTER
+			descText			@MV_BOTFILTER_INFO
+			cvar				"ui_botfilter"
+			cvarFloatList
+			{
+				"@MENUS0_NO"	1
+				"@MENUS0_YES"	0
+			}
+
+			textscale			.80
+			//rect				460 72 150 24
+			rect				460 40 150 24
+			textalign			0
+			textalignx			0
+			textaligny			-2
+			textalign			ITEM_ALIGN_LEFT
+			forecolor			1 1 1 1
+			visible				1
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+				uiScript		RefreshFilter
+			}
+
+			mouseenter
+			{
+				show			botfilter_button
+			}
+
+			mouseexit
+			{
+				hide			botfilter_button
+			}
+		}
+
+
+		//---------------------------------------------
+		//	HORIZONTAL SEPARATORS
+		//---------------------------------------------
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 94 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0.1 0.1 0.3 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 107 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0 0 0.2 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 120 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0.1 0.1 0.3 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 132 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0 0 0.2 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 146 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0.1 0.1 0.3 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 159 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0 0 0.2 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 172 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0.1 0.1 0.3 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 185 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0 0 0.2 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 198 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0.1 0.1 0.3 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 211 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0 0 0.2 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				horizontalseparators
+			rect				10 224 604 13
+			style				WINDOW_STYLE_FILLED
+			border				0
+			backcolor			0.1 0.1 0.3 0.5
+			visible				1
+			decoration
+		}
+
+
+		//---------------------------------------------
+		//	COLUMN LINES
+		//---------------------------------------------
+		itemDef 
+		{
+			name				serverColumn
+			group				grpColumn
+			rect				10 90 265 264
+			style				WINDOW_STYLE_FILLED
+			border				1
+			backcolor			0 0 0 0
+			bordersize			1
+			bordercolor			0.2 0.2 0.5 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				mapColumn
+			group				grpColumn
+			rect				275 90 125 264
+			style				WINDOW_STYLE_FILLED
+			border				1
+			backcolor			0 0 0 0
+			bordersize			1
+			bordercolor			0.2 0.2 0.5 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				playerColumn
+			group				grpColumn
+			rect				400 90 60 264
+			style				WINDOW_STYLE_FILLED
+			border				1
+			backcolor			0 0 0 0
+			bordersize			1
+			bordercolor			0.2 0.2 0.5 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				typeColumn
+			group				grpColumn
+			rect				460 90 100 264
+			style				WINDOW_STYLE_FILLED
+			border				1
+			backcolor			0 0 0 0
+			bordersize			1
+			bordercolor			0.2 0.2 0.5 0.5
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				pingColumn
+			group				grpColumn
+			rect				560 90 52 264
+			style				WINDOW_STYLE_FILLED
+			border				1
+			backcolor			0 0 0 0
+			bordersize			1
+			bordercolor			0.2 0.2 0.5 0.5
+			visible				1
+			decoration
+		}
+
+		//---------------------------------------------
+		//	SERVER LIST WINDOW
+		//---------------------------------------------
+		itemDef 
+		{
+			name				serverlist
+			rect				10 90 620 264
+			type				ITEM_TYPE_LISTBOX
+			style				WINDOW_STYLE_FILLED
+			elementwidth		120
+			elementheight		13
+			textscale			.70
+			textaligny			0
+			elementtype			LISTBOX_TEXT
+			feeder				FEEDER_SERVERS
+			border				1
+			bordercolor			0.2 0.2 0.5 0.5
+			forecolor			1 1 1 1
+			backcolor			0.25 0.25 0.8 0.25
+			outlinecolor		0 1 0 .25
+			visible				1
+			//columns				5  2 40 40   275 40 20  400 5 10  460 20 10  560 20 20
+			columns				5 2 40 258	270 40 104  388 5 64  450 20 100  560 20 47
+			mouseenter 
+			{ 
+				setitemcolor	serverlist bordercolor 1 1 0.4 1 
+			}
+			mouseexit 
+			{ 
+				setitemcolor	serverlist bordercolor 0.2 0.2 0.5 0.5
+			}
+			doubleClick 
+			{ 
+				uiScript		JoinServer 
+				close				joinserver
+//				open				forcealloc 
+			}
+			/*rightClick
+			{
+				play		"sound/interface/button1.wav" ;  
+				open		serverinfo_popmenu
+			}*/
+		}
+
+		//---------------------------------------------
+		//	SORT TABS	
+		//---------------------------------------------
+		itemDef 
+		{
+			name				server
+			group				grpTabs
+			text				@MENUS0_SERVER_NAME
+			descText			@MENUS0_SORT_BY_SERVER_NAME
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			background			"gfx/menus/menu_blendbox3"			// Frame around button
+			rect				10 66 265 26 
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			4					// center
+			textaligny			0
+			backcolor			0.6 0.6 0.6 1
+			forecolor			0.65 0.65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		ServerSort 0
+				setitemcolor	grpTabs backcolor 0.6 0.6 0.6 1
+				setitemcolor	server backcolor 1 1 1 1
+				setitemcolor	grpTabs forecolor 0.65 0.65 1 1
+				setitemcolor	server forecolor 1 1 1 1
+				setitemcolor	grpColumn backcolor 0 0 0 0
+				setitemcolor	serverColumn backcolor 0.1 0.1 0.5 0.5
+			}
+
+			mouseEnter 
+			{ 
+				setitemcolor	serverColumn bordercolor 1 1 0.4 1
+			}
+
+			mouseExit 
+			{ 
+				setitemcolor	serverColumn bordercolor 0.2 0.2 0.5 0.5 
+			}  
+		}
+
+		itemDef 
+		{
+			name				map
+			group				grpTabs
+			type				ITEM_TYPE_BUTTON
+			text				@MENUS0_MAP_NAME_1
+			descText			@MENUS0_SORT_BY_MAP_NAME
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			background			"gfx/menus/menu_blendbox3"			// Frame around button
+			rect				275 66 125 26
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			4					// center
+			textaligny			0
+			backcolor			0.6 0.6 0.6 1
+			forecolor			0.65 0.65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		ServerSort 1
+				setitemcolor	grpTabs backcolor 0.6 0.6 0.6 1
+				setitemcolor	map backcolor 1 1 1 1
+				setitemcolor	grpTabs forecolor 0.65 0.65 1 1
+				setitemcolor	map forecolor 1 1 1 1
+				setitemcolor	grpColumn backcolor 0 0 0 0
+				setitemcolor	mapColumn backcolor 0.1 0.1 0.5 0.5
+			}
+			mouseEnter 
+			{ 
+				setitemcolor	mapColumn bordercolor 1 1 0.4 1
+			}
+			mouseExit 
+			{ 
+				setitemcolor	mapColumn bordercolor 0.2 0.2 0.5 0.5 
+			}	  	  
+		}
+
+		itemDef 
+		{
+			name				Players
+			group				grpTabs
+			text				@MENUS0_PLYRS
+			descText			@MENUS0_SORT_BY_NUMBER_OF_PLAYERS
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			background			"gfx/menus/menu_blendbox3"			// Frame around button
+			rect				400 66 60 26
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			4					// center
+			textaligny			0
+			backcolor			0.6 0.6 0.6 1
+			forecolor			0.65 0.65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		ServerSort 2
+				setitemcolor	grpTabs backcolor 0.6 0.6 0.6 1
+				setitemcolor	Players backcolor 1 1 1 1
+				setitemcolor	grpTabs forecolor 0.65 0.65 1 1
+				setitemcolor	Players forecolor 1 1 1 1
+				setitemcolor	grpColumn backcolor 0 0 0 0
+				setitemcolor	playerColumn backcolor 0.1 0.1 0.5 0.5
+			}
+			mouseEnter 
+			{ 
+				setitemcolor	playerColumn bordercolor 1 1 0.4 1 
+			}
+			mouseExit 
+			{ 
+				setitemcolor	playerColumn bordercolor 0.2 0.2 0.5 0.5 
+			}  	  
+		}
+
+		itemDef 
+		{
+			name				Type
+			group				grpTabs
+			text				@MENUS0_SORT_TYPE
+			descText			@MENUS0_SORT_BY_GAME_TYPE
+			textscale			.90
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_FILLED
+			background			"gfx/menus/menu_blendbox3"			// Frame around button
+			rect				460 66 60 26
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			4					// center
+			textaligny			0
+			backcolor			0.6 0.6 0.6 1
+			forecolor			0.65 0.65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		ServerSort 3
+				setitemcolor	grpTabs backcolor 0.6 0.6 0.6 1
+				setitemcolor	Type backcolor 1 1 1 1
+				setitemcolor	grpTabs forecolor 0.65 0.65 1 1
+				setitemcolor	Type forecolor 1 1 1 1
+				setitemcolor	grpColumn backcolor 0 0 0 0
+				setitemcolor	typeColumn backcolor 0.1 0.1 0.5 0.5 
+			}
+			mouseEnter 
+			{ 
+				setitemcolor	typeColumn bordercolor 1 1 0.4 1 
+			}
+			mouseExit 
+			{ 
+				setitemcolor	typeColumn bordercolor 0.2 0.2 0.5 0.5 
+			}	  	  
+		}
+
+
+		itemDef 
+		{
+			name				Ping
+			group				grpTabs
+			text				@MENUS0_PING
+			descText			@MENUS0_SORT_BY_PING_TIME
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			background			"gfx/menus/menu_blendbox3"			// Frame around button
+			rect				560 66 52 26
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			4					// center
+			textaligny			0
+			backcolor			0.6 0.6 0.6 1
+			forecolor			0.65 0.65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		ServerSort 4
+				setitemcolor	grpTabs backcolor 0.6 0.6 0.6 1
+				setitemcolor	Ping backcolor 1 1 1 1  
+				setitemcolor	grpTabs forecolor 0.65 0.65 1 1
+				setitemcolor	Ping forecolor 1 1 1 1
+				setitemcolor	grpColumn backcolor 0 0 0 0 ;
+				setitemcolor	pingColumn backcolor 0.1 0.1 0.5 0.5 
+			}
+			mouseEnter 
+			{ 
+				setitemcolor	pingColumn bordercolor 1 1 0.4 1 
+			}
+			mouseExit 
+			{ 
+				setitemcolor	pingColumn bordercolor 0.2 0.2 0.5 0.5 
+			}	  
+		}
+
+		//---------------------------------------------
+		//	BOTTOM BUTTONS
+		//---------------------------------------------
+
+		itemDef 
+		{
+			name				passwordButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				10 380 120 32
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			appearance_slot		3
+		}
+
+		itemDef 
+		{
+			name				passwordText
+			text				@MENUS0_PASSWORD
+			descText			@MENUS0_INPUT_PASSWORD
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			rect				10 380 120 32
+			textalign			1
+			textalignx			60		// center
+			textaligny			2
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;  
+				open			password_popmenu 
+			}
+			mouseenter 
+			{ 
+				show			passwordButton
+			}
+			mouseexit 
+			{ 
+				hide			passwordButton
+			}
+		}
+
+
+		itemDef 
+		{
+			name				createFavoriteButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				135 380 120 32
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			appearance_slot		3
+		}
+
+		itemDef 
+		{
+			name				createFavoriteText
+			text				@MENUS0_NEW_FAVORITE
+			descText			@MENUS0_ENTER_IP_ADDRESS_OF_FAVORITE
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			rect				135 380 120 32
+			textalign			1
+			textalignx			60		// center
+			textaligny			2
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				open			createfavorite_popmenu 
+			}
+			mouseenter 
+			{ 
+				show			createFavoriteButton
+			}
+			mouseexit 
+			{ 
+				hide			createFavoriteButton
+			}
+		}
+
+		itemDef 
+		{
+			name				addFavoriteButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				260 380 120 32
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			appearance_slot		3
+		}
+
+		itemDef 
+		{
+			name				addFavorite
+			text				@MENUS0_ADD_FAVORITE
+			descText			@MENUS0_ADD_SELECTED_SERVER_TO
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			ownerdrawFlag		UI_SHOW_NOTFAVORITESERVERS
+			rect				260 380 120 32
+			textalign			1
+			textalignx			60		// center
+			textaligny			2
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		addFavorite 
+			}
+			mouseenter 
+			{ 
+				show			addFavoriteButton
+			}
+			mouseexit 
+			{ 
+				hide			addFavoriteButton
+			}
+		}
+
+
+		itemDef 
+		{
+			name				delfavorite
+			text				@MENUS0_DEL_FAVORITE
+			descText			@MENUS0_DELETE_SELECTED_SERVER
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			ownerdrawFlag		UI_SHOW_FAVORITESERVERS
+			rect				260 380 120 32
+			textalign			1
+			textalignx			60		// center
+			textaligny			2
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		DeleteFavorite
+				uiScript		UpdateFilter 
+			}
+			mouseenter 
+			{ 
+				show			addFavoriteButton
+			}
+			mouseexit 
+			{ 
+				hide			addFavoriteButton
+			}
+		}
+
+		itemDef 
+		{
+			name				serverinfoButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				385 380 120 32
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			appearance_slot		3
+		}
+
+		itemDef 
+		{
+			name				serverinfoText
+			text				@MENUS0_GET_SERVER_INFO
+			descText			@MENUS0_DISPLAY_SERVER_INFORMATION
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			rect				385 380 120 32
+			textalign			1
+			textalignx			60		// center
+			textaligny			2
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;  
+				open			serverinfo_popmenu 
+			}
+			mouseenter 
+			{ 
+				show			serverinfoButton
+			}
+			mouseexit 
+			{ 
+				hide			serverinfoButton
+			}
+		}
+
+		itemDef 
+		{
+			name				findPlayerButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				510 380 120 32
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			appearance_slot		3
+		}
+
+		itemDef 
+		{
+			name				findplayerText
+			text				@MENUS0_FIND_PLAYER
+			descText			@MENUS0_SEARCH_CURRENT_SERVER
+			type				ITEM_TYPE_BUTTON
+			textscale			.90
+			style				WINDOW_STYLE_FILLED
+			rect				510 380 120 32
+			textalign			1
+			textalignx			60		// center
+			textaligny			2
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.65 .65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;  
+				open			findplayer_popmenu 
+			}
+			mouseenter 
+			{ 
+				show			findPlayerButton
+			}
+			mouseexit 
+			{ 
+				hide			findPlayerButton
+			}
+		}
+
+		//---------------------------------------------
+		//	BOTTOM BUTTON OPTIONS
+		//---------------------------------------------
+		/*itemDef 
+		{
+			name				backButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				10 430 200 32
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			appearance_slot		3
+		}
+
+		itemDef 
+		{
+			name				back
+			text				@MENUS0_BACK
+			descText			@MENUS0_BACKUP_ONE_MENU
+			type				ITEM_TYPE_BUTTON
+			font				3
+			textscale			1
+			textstyle			3
+			style				WINDOW_STYLE_FILLED
+			rect				10 430 200 32
+			textalign			1
+			textalignx			100		// center
+			textaligny			2
+			textalign			ITEM_ALIGN_CENTER
+			forecolor				0.65 0.65 1 1
+			visible				1 
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			joinserver ; 
+				open			multiplayermenu
+			}
+			mouseenter 
+			{ 
+				show			backButton
+			}
+			mouseexit 
+			{ 
+				hide			backButton
+			}
+		}
+
+		itemDef 
+		{
+			name				acceptButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				430 430 200 32
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			appearance_slot		3
+		}
+
+		itemDef 
+		{
+			name					accept
+			text					@MENUS0_JOIN
+			descText				@MENUS0_JOIN_CHOSEN_SERVER
+			type					ITEM_TYPE_BUTTON
+			font					3
+			textscale				1
+			textstyle				3
+			style					WINDOW_STYLE_FILLED
+			rect					430 430 200 32
+			textalign				1
+			textalignx				100		// center
+			textaligny				2
+			forecolor				0.65 0.65 1 1
+			visible					1 
+
+      		action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		JoinServer
+				close				joinserver 
+			}
+
+			mouseenter 
+			{ 
+				show			acceptButton
+			}
+			mouseexit 
+			{ 
+				hide			acceptButton
+			}
+		}*/
+	}
+
+	//menu defs for popup menus below..
+	menuDef 
+	{
+		name					"password_popmenu"
+		visible					0
+		fullscreen				0
+		outOfBoundsClick									// this closes the window if it gets a click out of the rectangle
+		rect					200 150 240 180
+		focusColor				1 1 1 1								// Focus color for text and items
+		style					1
+		border					1
+		descX					320
+		descY					300
+		descScale				0.7
+		descColor				.235 .882 .847 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+		popup
+
+		onESC 
+		{ 
+			close				password_popmenu
+//			open				joinserver
+		}
+
+		//---------------------------------------------
+		//	LITTLE FRAME
+		//---------------------------------------------
+		itemDef 
+		{
+			name					frame_pic
+			group					none
+			style					WINDOW_STYLE_SHADER
+			rect					0 0 240 180
+			background				"gfx/menus/menu_box_ingame"
+			forecolor				1 1 1 1
+			decoration
+			visible					1 
+			appearance_slot			1
+		}
+
+		//---------------------------------------------
+		//	PASSWORD
+		//---------------------------------------------
+		// title
+		itemDef 
+		{
+			name				passwordTitle
+			text				@MENUS1_ENTER_PASSWORD
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			rect				10 5 220 20
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			110
+			textaligny			1
+			forecolor			1 1 1 1
+      		visible			1 
+      		decoration 
+		}
+
+
+		itemDef 
+		{
+			name				passwordEntry
+			style				1
+			descText			@MENUS1_INPUT_PASSWORD_1
+			text				@MENUS2_BLANK_1
+			maxchars			15
+			font				2
+			textscale			.8
+			TYPE				4
+			cvar				"password" 
+			rect				20 50 200 30
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			20
+			textaligny			3
+			forecolor			1 1 1 1
+			backcolor			.25 .25 .25 .5
+			visible				1
+			mouseenter 
+			{ 
+				setitemcolor	passwordEntry backcolor .25 .25 .25 .75 
+			}
+			mouseexit 
+			{ 
+				setitemcolor	passwordEntry backcolor .25 .25 .25 .5 
+			}
+		}
+
+		itemDef 
+		{
+			name				doneButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				20 110 200 30
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible				0
+		}
+
+		itemDef 
+		{
+			name				doneText
+			text				@MENUS1_DONE
+			descText			@MENUS1_FINISHED_INPUTTING_INFO
+			type				1
+			font				3
+			textscale			.8
+			style				WINDOW_STYLE_FILLED
+			rect				20 110 200 30
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			100
+			textaligny			5
+			forecolor			0.65 0.65 1 1
+			visible				1
+			action 
+			{ 
+				play			"sound/misc/nomenu.wav"
+				close			password_popmenu
+//				open			joinserver
+			}
+			mouseEnter 
+			{ 
+				show				doneButton
+			}
+			mouseExit 
+			{ 
+				hide				doneButton
+			}	  	  
+		}
+	}
+
+	menuDef 
+	{
+		name					"createfavorite_popmenu"
+		visible					0
+		fullscreen				0
+		outOfBoundsClick									// this closes the window if it gets a click out of the rectangle
+		rect					200 150 240 180
+		focusColor				1 1 1 1								// Focus color for text and items
+		style					1
+		border					1
+		descX					320
+		descY					300
+		descScale				0.7
+		descColor				.235 .882 .847 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+		popup
+
+		onOpen
+		{
+			setfocus			addressEntry
+		}
+		onESC 
+		{ 
+			close				createfavorite_popmenu
+		}
+
+		//---------------------------------------------
+		//	LITTLE FRAME
+		//---------------------------------------------
+		itemDef 
+		{
+			name					frame_pic
+			group					none
+			style					WINDOW_STYLE_SHADER
+			rect					0 0 240 180
+			background				"gfx/menus/menu_box_ingame"
+			forecolor				1 1 1 1
+			decoration
+			visible					1 
+			appearance_slot			1
+		}
+
+		//---------------------------------------------
+		//	SCREEN TITLE	
+		//---------------------------------------------
+		// title
+		itemDef 
+		{
+			name				screenTitle
+			text				@MENUS1_FAVORITE_SERVER_INFO
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			rect				10 5 220 20
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			110
+			textaligny			1
+			forecolor			1 1 1 1
+      		visible			1 
+      		decoration 
+		}
+
+		//---------------------------------------------
+		//	ENTER NAME AND ADDRESS
+		//---------------------------------------------
+/*
+		itemDef 
+		{
+			name				nameTitle
+			text				@MENUS3_FAVE_NAME
+			style				0
+			decoration
+			font				1
+			textscale			.8
+			rect				177 126 110 20
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			1
+			textaligny			3
+			forecolor			1 1 1 1
+			visible				1
+		}
+
+		itemDef 
+		{
+			name				nameEntry
+			style				1
+			maxchars			15
+			text				@MENUS2_BLANK_1
+			descText			@MENUS3_FAVE_NAME_DESC
+			font				1
+			textscale			.8
+			TYPE				4
+			cvar				"ui_favoriteName"
+			rect				265 126 150 20
+			textalign			0
+			textalignx			-16
+			textaligny			3
+			forecolor			1 1 1 1
+			backcolor			.25 .25 .25 .5
+			visible				1
+			mouseenter 
+			{ 
+				setitemcolor	nameEntry backcolor .25 .25 .25 .75 
+			}
+			mouseexit 
+			{ 
+				setitemcolor	nameEntry backcolor .25 .25 .25 .5 
+			}
+		}
+*/
+
+
+		itemDef 
+		{
+			name				addressTitle
+			text				@MENUS2_ENTER_IP_ADDRESS
+			style				0
+			decoration
+			font				2
+			textscale			.8
+			rect				10 35 220 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			110
+			textaligny			3
+			forecolor			1 1 1 1
+			visible				1
+		}
+
+		itemDef 
+		{
+			name				addressEntry
+			style				1
+			maxPaintChars		21
+			text				" "
+			descText			@MENUS1_INPUT_IP_ADDRESS_OF_SERVER
+			font				2
+			textscale			.8
+			TYPE				4
+			maxchars			21
+			cvar				"ui_favoriteAddress"
+			rect				10 59 220 20
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			42
+			textaligny			-2
+			forecolor			1 1 1 1
+			backcolor			.25 .25 .25 .5
+			visible				1
+			mouseenter 
+			{ 
+				setitemcolor	addressEntry backcolor .25 .25 .25 .75 
+			}
+
+			mouseexit 
+			{ 
+				setitemcolor	addressEntry backcolor .25 .25 .25 .5 
+			}
+		}
+
+
+		itemDef 
+		{
+			name				doneButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				20 110 200 30
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible				0
+		}
+
+		itemDef 
+		{
+			name				doneText
+			text				@MENUS1_DONE
+			descText			@MENUS1_FINISHED_INPUTTING_INFO
+			type				1
+			font				3
+			textscale			.8
+			style				WINDOW_STYLE_FILLED
+			rect				20 110 200 30
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			100
+			textaligny			5
+			forecolor			0.65 0.65 1 1
+			visible				1
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				uiScript		CreateFavorite
+				close			createfavorite_popmenu
+			}
+			mouseEnter 
+			{ 
+				show				doneButton
+			}
+			mouseExit 
+			{ 
+				hide				doneButton
+			}	  	  
+		}
+	}
+
+	menuDef 
+	{
+		name					"serverinfo_popmenu"
+		visible					0
+		fullscreen				0
+		outOfBoundsClick									// this closes the window if it gets a click out of the rectangle
+		rect					140 60 360 360
+		focusColor				1 1 1 1								// Focus color for text and items
+		style					1
+		border					1
+		descX					320
+		descY					398
+		descScale				0.7
+		descColor				.235 .882 .847 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+		popup
+
+		onOpen 
+		{ 
+			uiScript			ServerStatus 
+		}
+
+		onESC 
+		{ 
+			close				serverinfo_popmenu
+		}
+
+		//---------------------------------------------
+		//	LITTLE FRAME
+		//---------------------------------------------
+		itemDef 
+		{
+			name					frame_pic
+			group					none
+			style					WINDOW_STYLE_SHADER
+			rect					0 0 360 360
+			background				"gfx/menus/menu_box_ingame"
+			forecolor				1 1 1 1
+			decoration
+			visible					1 
+			appearance_slot			1
+		}
+
+		//---------------------------------------------
+		//	TITLE
+		//---------------------------------------------
+		// title
+		itemDef 
+		{
+			name				screenTitle
+			text				@MENUS1_SERVER_INFORMATION 
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			rect				10 5 340 20
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			170
+			textaligny			1
+			forecolor			1 1 1 1
+      		visible			1 
+      		decoration 
+		}
+
+		//---------------------------------------------
+		//	SERVER INFO
+		//---------------------------------------------
+		itemDef 
+		{
+			name				serverinfoList
+			rect				10 27 340 280
+			type				ITEM_TYPE_LISTBOX
+			style				WINDOW_STYLE_FILLED
+			elementwidth		120
+			elementheight		16
+			font				2
+			textscale			.7
+			backcolor			0 0 0 0.5
+			border				1
+			bordersize			1
+			bordercolor			.5 .5 .5 1
+			elementtype			LISTBOX_TEXT
+			feeder				FEEDER_SERVERSTATUS
+			notselectable
+			visible				1
+			columns				4	 2   40  20
+									40   40  10
+									90   40  10
+									135  40  20
+		}
+
+		//---------------------------------------------
+		//	BUTTONS
+		//---------------------------------------------
+		itemDef 
+		{
+			name				refreshButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				10 310 170 30
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible				0
+		}
+
+		itemDef 
+		{
+			name				refresh
+			text				@MENUS0_REFRESH_LIST
+			descText			@MENUS0_REFRESH_SERVER_LIST
+			type				1
+			font				3
+			textscale			.8
+			style				WINDOW_STYLE_FILLED
+			rect				10 310 170 30
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			85
+			textaligny			5
+			forecolor			0.65 0.65 1 1
+			visible				1
+			action 
+			{ 
+				uiScript		ServerStatus 
+			}
+			mouseEnter 
+			{ 
+				show			refreshButton
+			}
+			mouseExit 
+			{ 
+				hide			refreshButton
+			}	  	  
+		}
+
+		itemDef 
+		{
+			name				doneButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				180 310 170 30
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible				0
+		}
+
+		itemDef 
+		{
+			name				doneText
+			text				@MENUS3_DONE_CAPS
+			descText			@MENUS3_DONE_DESC
+			type				1
+			font				3
+			textscale			.8
+			style				WINDOW_STYLE_FILLED
+			rect				180 310 170 30
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			85
+			textaligny			5
+			forecolor			0.65 0.65 1 1
+			visible				1
+			action 
+			{ 
+				play			"sound/misc/nomenu.wav"
+				close			serverinfo_popmenu
+			}
+			mouseEnter 
+			{ 
+				show			doneButton
+			}
+			mouseExit 
+			{ 
+				hide			doneButton
+			}	  	  
+		}
+	}
+
+	menuDef 
+	{
+		name "findplayer_popmenu"
+		visible					0
+		fullscreen				0
+		outOfBoundsClick									// this closes the window if it gets a click out of the rectangle
+		rect					140 60 360 360
+		focusColor				1 1 1 1								// Focus color for text and items
+		style					1
+		border					1
+		descX					320
+		descY					398
+		descScale				0.7
+		descColor				.235 .882 .847 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+		popup
+
+		onOpen 
+		{ 
+			uiScript			FindPlayer
+			setfocus			nameField 
+		}
+		onESC 
+		{ 
+			close				findplayer_popmenu
+		}
+
+
+		//---------------------------------------------
+		//	LITTLE FRAME
+		//---------------------------------------------
+		itemDef 
+		{
+			name					frame_pic
+			group					none
+			style					WINDOW_STYLE_SHADER
+			rect					0 0 360 360
+			background				"gfx/menus/menu_box_ingame"
+			forecolor				1 1 1 1
+			decoration
+			visible					1 
+			appearance_slot			1
+		}
+
+		//---------------------------------------------
+		//	TITLE
+		//---------------------------------------------
+		// title
+		itemDef 
+		{
+			name				screenTitle
+			text				@MENUS0_FIND_PLAYER
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			rect				10 5 340 20
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			170
+			textaligny			1
+			forecolor			1 1 1 1
+      		visible			1 
+      		decoration 
+		}
+
+		//---------------------------------------------
+		//	PLAYER NAME
+		//---------------------------------------------
+		itemDef 
+		{
+			name				nameTitle
+			text				@MENUS0_NAME
+			style				0
+			decoration
+			font				2
+			textscale			.9
+			rect				10 30 90 25
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			85
+			textaligny			0
+			forecolor			1 1 1 1
+			visible				1
+		}
+
+		itemDef 
+		{
+			name				nameEntry
+			style				1
+			descText			@MENUS1_INPUT_PLAYER_NAME
+			text				@MENUS2_BLANK_1
+			maxchars			15
+			font				2
+			textscale			.9
+			type				ITEM_TYPE_EDITFIELD
+			cvar				"ui_findplayer"
+			rect				100 30 250 25
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			5
+			textaligny			0
+			forecolor			1 1 1 1
+			backcolor			.25 .25 .25 .5
+			visible				1
+			action 
+			{ 
+				ui_script		FindPlayer 
+			}
+			mouseenter 
+			{ 
+				setitemcolor	nameEntry backcolor .25 .25 .25 .75 
+			}
+			mouseexit 
+			{ 
+				setitemcolor	nameEntry backcolor .25 .25 .25 .5 
+			}
+		}
+
+
+		//---------------------------------------------
+		//	LIST OF SERVER NAMES
+		//---------------------------------------------
+		itemDef 
+		{
+			name				serverNameList		
+			rect				10 60 340 90
+			type				ITEM_TYPE_LISTBOX
+			style				WINDOW_STYLE_FILLED
+			elementwidth		120
+			elementheight		16
+			//textaligny			-2
+			font				2
+			textscale			.8
+			backcolor			0 0 0 0.5
+			outlinecolor		.1 .1 .7 .5
+			border				1
+			bordersize			1
+			bordercolor			.5 .5 .5 1
+			elementtype			LISTBOX_TEXT
+			feeder				FEEDER_FINDPLAYER
+			visible				1
+			mouseenter 
+			{ 
+				setitemcolor	serverNameWindow bordercolor .7 0 0 1  
+			}
+			mouseexit 
+			{ 
+				setitemcolor	serverNameWindow bordercolor .5 .5 .5 1 
+			}
+		}
+
+		itemDef 
+		{
+			name				serverNameWindow 
+			rect				10 60 340 90
+			style				1
+			backcolor			0 0 0 0
+			forecolor			0 0 0 0
+			border				1
+			bordersize			1
+			bordercolor			.5 .5 .5 1
+			visible				1
+			decoration
+		}
+
+		//---------------------------------------------
+		//	LIST OF SERVER STATUS INFORMATION
+		//---------------------------------------------
+		itemDef 
+		{
+			name				serverInfoList		
+			rect				10 160 340 150
+			type				ITEM_TYPE_LISTBOX
+			style				WINDOW_STYLE_FILLED
+			elementwidth		120
+			elementheight		16
+			font				2
+			textscale			.7
+			backcolor			0 0 0 1
+			border				1
+			bordersize			1
+			bordercolor			.5 .5 .5 1
+			elementtype			LISTBOX_TEXT
+			feeder				FEEDER_SERVERSTATUS
+			notselectable
+			visible				1
+			columns				4	2 40 20
+								40 40 10
+								90 40 10
+								135 40 20
+			mouseenter 
+			{ 
+				setitemcolor	serverInfowindow bordercolor .7 0 0 1  
+			}
+			mouseexit 
+			{ 
+				setitemcolor	serverInfowindow bordercolor .5 .5 .5 1 
+			}
+		}
+
+		itemDef 
+		{
+			name				serverInfowindow 
+			rect				10 160 340 150
+			style				1
+			backcolor			0 0 0 0
+			forecolor			0 0 0 0
+			border				1
+			bordersize			1
+			bordercolor			.5 .5 .5 1
+			visible				1
+			decoration
+		}
+
+		//---------------------------------------------
+		//	BUTTONS
+		//---------------------------------------------
+		itemDef 
+		{
+			name				searchButton				// Button frame around SEARCH button
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 310 120 30
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible				0
+		}
+
+		itemDef 
+		{
+			name				search
+			text				@MENUS3_SEARCH_CAPS
+			descText			@MENUS3_SEARCH_DESC
+			type				1
+			font				3
+			textscale			.8
+			style				WINDOW_STYLE_FILLED
+			rect				0 310 120 30
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			60
+			textaligny			5
+			forecolor			0.65 0.65 1 1
+			visible				1
+			action 
+			{ 
+				play			"sound/misc/nomenu.wav" ;
+				ui_script		FindPlayer 
+			}
+			mouseEnter 
+			{ 
+				show			searchButton
+			}
+			mouseExit 
+			{ 
+				hide			searchButton
+			}	  	  
+		}
+
+		itemDef 
+		{
+			name				doneButton
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				120 310 120 30
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible				0
+		}
+
+		itemDef 
+		{
+			name				doneText
+			text				@MENUS3_DONE_CAPS
+			descText			@MENUS3_DONE_DESC
+			type				1
+			font				3
+			textscale			.8
+			style				WINDOW_STYLE_FILLED
+			rect				120 310 120 30
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			60
+			textaligny			5
+			forecolor			0.65 0.65 1 1
+			visible				1
+			action 
+			{ 
+				play			"sound/misc/nomenu.wav"
+				close			findplayer_popmenu
+			}
+			mouseEnter 
+			{ 
+				show			doneButton
+			}
+			mouseExit 
+			{ 
+				hide			doneButton
+			}	  	  
+		}
+
+		itemDef 
+		{
+			name				joinButton				// Button frame around JOIN button
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				240 310 120 30
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible				0
+		}
+
+		itemDef 
+		{
+			name				join
+			text				@MENUS3_JOIN_CAPS
+			descText			@MENUS3_JOIN_PLAYER_DESC
+			type				1
+			font				3
+			textscale			.8
+			style				WINDOW_STYLE_FILLED
+			rect				240 310 120 30
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			60
+			textaligny			5
+			forecolor			0.65 0.65 1 1
+			visible				1
+			action 
+			{  
+				play			"sound/interface/button1.wav" ; 
+				ui_script		FoundPlayerJoinServer 
+			}
+			mouseEnter 
+			{ 
+				show			joinButton
+			}
+			mouseExit 
+			{ 
+				hide			joinButton
+			}	  	  
+		}
+	}
+}

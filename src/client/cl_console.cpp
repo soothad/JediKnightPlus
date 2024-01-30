@@ -577,7 +577,6 @@ void Con_CheckResize (void)
 Con_Init
 ================
 */
-static char version[MAX_STRING_CHARS] = { 0 };
 void Con_Init (void) {
 	con_height = Cvar_Get ("con_height", "0.5", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_notifytime = Cvar_Get ("con_notifytime", "3", CVAR_GLOBAL | CVAR_ARCHIVE);
@@ -606,50 +605,6 @@ void Con_Init (void) {
 
 	//Initialize values on first print
 	con.initialized = qfalse;
-
-#ifndef _DEBUG
-	{//build version string for console
-		int day, year;
-		char month[4];
-
-		if (sscanf(__DATE__, "%s %i %i", &month, &day, &year) == 3) {
-			int mm = 0;
-
-			//sry..
-			if (month[0] == 'J' && month[1] == 'a' && month[2] == 'n')
-				mm = 1;
-			else if (month[0] == 'F')
-				mm = 2;
-			else if (month[0] == 'M' && month[1] == 'a' && month[2] == 'r')
-				mm = 3;
-			else if (month[0] == 'A' && month[1] == 'p')
-				mm = 4;
-			else if (month[0] == 'M' && month[1] == 'a' && month[2] == 'y')
-				mm = 5;
-			else if (month[0] == 'J' && month[1] == 'u' && month[2] == 'n')
-				mm = 6;
-			else if (month[0] == 'J' && month[1] == 'u' && month[2] == 'l')
-				mm = 7;
-			else if (month[0] == 'A' && month[1] == 'u')
-				mm = 8;
-			else if (month[0] == 'S')
-				mm = 9;
-			else if (month[0] == 'O')
-				mm = 10;
-			else if (month[0] == 'N')
-				mm = 11;
-			else if (month[0] == 'D')
-				mm = 12;
-
-			Com_sprintf(version, sizeof(version), "EternalJK2MV: [%02i/%02i/%04i]", mm, day, year);
-		}
-	}
-#else
-	Com_sprintf(version, sizeof(version), "EternalJK2MV: (DEBUG)");
-#endif
-
-	if (!version[0])
-		Q_strncpyz(version, "EternalJK2MV", sizeof(version));
 }
 
 
@@ -1002,6 +957,7 @@ void Con_DrawSolidConsole( float frac ) {
 	int				rows;
 	int				row;
 	int				lines;
+	char *vertext;
 
 	struct tm		*newtime;
 	char			am_pm[] = "AM";
@@ -1032,19 +988,12 @@ void Con_DrawSolidConsole( float frac ) {
 	re.SetColor( g_color_table[ColorIndex_Extended(COLOR_JK2MV)] );
 	SCR_DrawPic( 0, y, SCREEN_WIDTH, 2, cls.whiteShader );
 
-#if 0
-	i = (int)strlen(Q3_VERSION);
-	for (x = 0; x<i; x++) {
-		SCR_DrawSmallChar(cls.glconfig.vidWidth - (i - x + 1) * con.charWidth,
-			(lines - (con.charHeight * 2 + con.charHeight / 2)) + padding, Q3_VERSION[x]);
-	}
-#else
-	i = (int)strlen(version);
+	vertext = Q3_VERSION;
+	i = (int)strlen(vertext);
 	for (x = 0; x < i; x++) {
 		SCR_DrawSmallChar(cls.glconfig.vidWidth - (i - x + 1) * con.charWidth,
-			(lines - (con.charHeight * 2 + con.charHeight / 2)) + padding, version[x]);
+			(lines - (con.charHeight * 2 + con.charHeight / 2)) + padding, vertext[x]);
 	}
-#endif
 
 	// Draw time and date
 	time(&rawtime);

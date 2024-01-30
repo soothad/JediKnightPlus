@@ -19,14 +19,14 @@ list(INSERT CMAKE_MODULE_PATH 0 "${RESDir}")
 # Project & Versioning
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(ProjectName "EternalJK2" CACHE STRING "Project Name")
+set(ProjectName "JK2MV" CACHE STRING "Project Name")
 set(ProjectURL "https://jk2mv.org")
 project(${ProjectName})
 
 include(GetGitRevisionDescription)
 git_describe(MV_VERSION --tags --match 1.4)
 if(NOT MV_VERSION OR MV_VERSION STREQUAL "GIT-NOTFOUND" OR MV_VERSION STREQUAL "HEAD-HASH-NOTFOUND")
-	set(MV_VERSION "1.4.1")
+	set(MV_VERSION "UNKNOWN")
 	message(WARNING "Could not find git or git repository. Install git and make sure you actually cloned the repository (Directory named .git must exist) for correct versioning.")
 endif()
 
@@ -44,8 +44,8 @@ endif()
 
 # Customizable options
 option(BuildPortableVersion "Build portable version (does not read or write files from your user/home directory" ON)
-option(BuildMVMP "Whether to create targets for the client (eternaljk2mvmp & eternaljk2mvmenu)" ON)
-option(BuildMVDED "Whether to create targets for the dedicated server (eternaljk2mvded)" ON)
+option(BuildMVMP "Whether to create targets for the client (jk2mvmp & jk2mvmenu)" ON)
+option(BuildMVDED "Whether to create targets for the dedicated server (jk2mvded)" ON)
 option(BuildMVSDK "Whether to build and integrate the mvsdk modules" ON)
 
 set(SystemProcessor "${CMAKE_SYSTEM_PROCESSOR}" CACHE STRING "Option to override CMAKE_SYSTEM_PROCESSOR")
@@ -55,7 +55,7 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/src/mvsdk/code/ui/CMakeLists.txt")
 endif()
 
 if(BuildMVSDK AND NOT EXISTS "${CMAKE_SOURCE_DIR}/src/mvsdk/CMakeLists.txt")
-    message(WARNING "Could not find CMakeLists.txt in \"src/mvsdk\". Make sure you cloned eternaljk2mv including submodules. Continuing with BuildMVSDK=OFF.")
+    message(WARNING "Could not find CMakeLists.txt in \"src/mvsdk\". Make sure you cloned jk2mv including submodules. Continuing with BuildMVSDK=OFF.")
     set(BuildMVSDK OFF)
 endif()
 
@@ -169,14 +169,12 @@ if(ARCH_UNKNOWN)
 endif()
 
 # Binary names
-set(MVMP "eternaljk2mvmp")
-set(MVMENU_STRING "eternaljk2mvmenu")
-set(MVMENU "${MVMENU_STRING}_${Architecture}")
+set(MVMP "jk2mvmp")
+set(MVMENU "jk2mvmenu_${Architecture}")
 set(MVGAME "jk2mpgame_${Architecture}")
 set(MVCGAME "cgame_${Architecture}")
 set(MVUI "ui_${Architecture}")
-
-set(MVDED "eternaljk2mvded")
+set(MVDED "jk2mvded")
 
 # Directories
 if(MultiConfigGenerator)
@@ -359,7 +357,7 @@ add_subdirectory(libs/mongoose)
 
 # Package
 set(CPACK_PACKAGE_NAME ${ProjectName})
-set(CPACK_PACKAGE_FILE_NAME "eternaljk2mv-v${MV_VERSION}")
+set(CPACK_PACKAGE_FILE_NAME "jk2mv-v${MV_VERSION}")
 set(CPACK_PACKAGE_VENDOR "jk2mv.org")
 set(CPACK_PACKAGE_CONTACT "jk2mv.org <contact@jk2mv.org>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Jedi Knight II: Multi Version")
@@ -404,15 +402,15 @@ else()
 		set(CPACK_GENERATOR "TGZ")
 	else()
 		set(CPACK_GENERATOR ${CPACK_GENERATOR} "DEB")
-		set(CPACK_DEBIAN_PACKAGE_NAME "eternaljk2mv") # debian packages are lowercase
+		set(CPACK_DEBIAN_PACKAGE_NAME "jk2mv") # debian packages are lowercase
 		set(CPACK_DEBIAN_PACKAGE_SECTION "games")
 		set(CPACK_DEBIAN_PACKAGE_HOMEPAGE ${ProjectURL})
 		set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${Architecture})
 		set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
 		set(CPACK_GENERATOR ${CPACK_GENERATOR} "RPM")
-		set(CPACK_RPM_PACKAGE_NAME "eternaljk2mv")
-		set(CPACK_RPM_PACKAGE_DESCRIPTION "EternalJK2MV (Multi Version) is a modification for Jedi Knight II: Jedi Outcast. It supports all three game versions and comes with various features and optimizations.")
+		set(CPACK_RPM_PACKAGE_NAME "jk2mv")
+		set(CPACK_RPM_PACKAGE_DESCRIPTION "JK2MV (Multi Version) is a modification for Jedi Knight II: Jedi Outcast. It supports all three game versions and comes with various features and optimizations.")
 		set(CPACK_RPM_PACKAGE_URL ${ProjectURL})
 		set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
 		set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
