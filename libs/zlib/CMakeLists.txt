@@ -7,7 +7,7 @@
 # files from the root of the tarball to this folder, and then moving the public
 # header files (zlib.h, zconf.h) into the include/ subfolder.
 #
-# The current bundled copy comes from the zlib 643e17b7498d12ab8d15565662880579692f769d (November 14, 2023).
+# The current bundled copy comes from the zlib 1.3.1 release.
 
 include_directories(include/)
 
