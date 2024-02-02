@@ -568,6 +568,7 @@ if (BuildMVMP)
 		"mvsdk/code/ui/ui_local.h"
 		"mvsdk/code/ui/ui_public.h"
 		"mvsdk/code/ui/ui_shared.h"
+		"mvsdk/code/ui/ui_skin.h"
 		"mvsdk/code/ui/ui_multiversion.h"
 		"mvsdk/code/ui/ui_multiversion_syscalls.h"
 
@@ -583,6 +584,7 @@ if (BuildMVMP)
 		"mvsdk/code/ui/ui_gameinfo.c"
 		"mvsdk/code/ui/ui_saber.c"
 		"mvsdk/code/ui/ui_shared.c"
+		"mvsdk/code/ui/ui_skin.c"
 		"mvsdk/code/ui/ui_multiversion.c"
 
 		"mvsdk/code/game/bg_misc.c"
