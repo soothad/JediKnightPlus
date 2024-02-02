@@ -2319,7 +2319,6 @@ static const char **FS_ListFilteredFiles( const char *path, const char *extensio
 			{
 				netpath = FS_BuildOSPath( search->dir->path, search->dir->gamedir, path );
 				sysFiles = Sys_ListFiles( netpath, extension, filter, &numSysFiles, qfalse );
-				FS_SortFileList(sysFiles, numSysFiles);
 				for ( i = 0 ; i < numSysFiles ; i++ ) {
 					// unique the match
 					name = sysFiles[i];
@@ -2339,6 +2338,7 @@ static const char **FS_ListFilteredFiles( const char *path, const char *extensio
 	}
 
 	list[nfiles] = NULL;
+	FS_SortFileList(list, nfiles);
 
 	return list;
 }
