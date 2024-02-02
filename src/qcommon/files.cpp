@@ -3355,7 +3355,7 @@ static void FS_Startup( const char *gameName ) {
 	fs_homepath = Cvar_Get ("fs_homepath", Sys_DefaultHomePath(), CVAR_INIT | CVAR_VM_NOWRITE );
 	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 	fs_forcegame = Cvar_Get ("fs_forcegame", "base", CVAR_INIT );
-	fs_dirBeforePak = Cvar_Get ("fs_dirBeforePak", "1", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL );
+	fs_dirBeforePak = Cvar_Get ("fs_dirBeforePak", "1", CVAR_INIT | CVAR_VM_NOWRITE );
 	fs_maxFoundFiles = Cvar_Get("fs_maxFoundFiles", "16384", CVAR_INIT | CVAR_VM_NOWRITE);
 
 	assetsPath = Sys_DefaultAssetsPath();
