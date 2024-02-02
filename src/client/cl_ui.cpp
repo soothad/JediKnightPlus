@@ -1394,6 +1394,17 @@ Ghoul2 Insert End
 		}
 	}
 
+	case UI_FS_CREATE_FILE_LIST:
+		return FS_CreateFileList(VMAS(1), VMAS(2));
+
+	case UI_FS_CLOSE_FILE_LIST:
+		FS_CloseFileList();
+		return 0;
+
+	case UI_FS_GET_NEXT_FILE:
+		FS_GetNextFile(VMAP(1, char, args[2]), args[2]);
+		return 0;
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(uivm);
 	}

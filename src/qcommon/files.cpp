@@ -4301,3 +4301,51 @@ qboolean FS_DeleteDLFile(const char *qpath) {
 
 	return (qboolean)!!remove(ospath);
 }
+
+static const char **fileList = NULL;
+static int fileCount = 0;
+static int fileCurrent = 0;
+
+void FS_CloseFileList(void)
+{
+	if (fileList == NULL)
+		return;
+
+	FS_FreeFileList(fileList);
+	fileList = NULL;
+	fileCount = 0;
+	fileCurrent = 0;
+}
+
+int FS_CreateFileList(const char *path, const char *extension)
+{
+	if (fileList != NULL)
+		FS_CloseFileList();
+
+	fileList = FS_ListFilteredFiles(path, extension, NULL, &fileCount, qfalse);
+
+	if (fileCount <= 0)
+		FS_CloseFileList();
+
+	return fileCount;
+}
+
+void FS_GetNextFile(char *path, int count)
+{
+	if (count <= 0)
+		return;
+
+	path[0] = '\0';
+
+	if (fileList == NULL)
+		return;
+
+	if (fileCurrent < 0 || fileCurrent >= fileCount)
+	{
+		FS_CloseFileList();
+		return;
+	}
+
+	strncpy(path, fileList[fileCurrent], (size_t) count);
+	fileCurrent++;
+}

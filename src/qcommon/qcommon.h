@@ -744,6 +744,9 @@ void FS_HomeRemove( const char *homePath );
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
 qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module = MODULE_MAIN );
+int FS_CreateFileList(const char *path, const char *extension);
+void FS_CloseFileList(void);
+void FS_GetNextFile(char *path, int count);
 
 /*
 ==============================================================
