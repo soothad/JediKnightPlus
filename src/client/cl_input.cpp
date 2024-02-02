@@ -1087,7 +1087,7 @@ void CL_WritePacket( void ) {
 	count = cl.cmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
 	if ( count > MAX_PACKET_USERCMDS ) {
 		count = MAX_PACKET_USERCMDS;
-		Com_Printf("MAX_PACKET_USERCMDS\n");
+		Com_DPrintf(S_COLOR_YELLOW "WARNING: CL_WritePacket: count (%d) > MAX_PACKET_USERCMDS (%d)\n", count, MAX_PACKET_USERCMDS);
 	}
 	if ( count >= 1 ) {
 		const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
