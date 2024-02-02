@@ -31,6 +31,8 @@
 
 #include <mv_setup.h>
 
+extern cvar_t *fs_maxFoundFiles;
+
 //=============================================================================
 
 // Used to determine CD Path
@@ -97,8 +99,6 @@ qboolean Sys_Mkdir( const char *path )
 
 //============================================
 
-#define	MAX_FOUND_FILES	0x1000
-
 // bk001129 - new in 1.26
 static void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, const char **list, int *numfiles ) {
 	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
@@ -107,7 +107,7 @@ static void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *fil
 	struct dirent *d;
 	struct stat st;
 
-	if ( *numfiles >= MAX_FOUND_FILES - 1 ) {
+	if ( *numfiles >= fs_maxFoundFiles->integer - 1 ) {
 		return;
 	}
 
@@ -138,7 +138,7 @@ static void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *fil
 				Sys_ListFilteredFiles( basedir, newsubdirs, filter, list, numfiles );
 			}
 		}
-		if ( *numfiles >= MAX_FOUND_FILES - 1 ) {
+		if ( *numfiles >= fs_maxFoundFiles->integer - 1 ) {
 			break;
 		}
 		Com_sprintf( filename, sizeof(filename), "%s/%s", subdirs, d->d_name );
@@ -169,32 +169,30 @@ const char **Sys_ListFiles( const char *directory, const char *extension, char *
 	qboolean dironly = wantsubs;
 	char		search[MAX_OSPATH];
 	int			nfiles;
-	const char	**listCopy;
-	const char	*list[MAX_FOUND_FILES];
+	const char	**list;
 	//int			flag; // bk001204 - unused
-	int			i;
 	struct stat st;
 
 	int			extLen;
+
+	list = (const char **)Z_Malloc( ( fs_maxFoundFiles->integer + 1 ) * sizeof( *list ),TAG_LISTFILES,qfalse );
+	list[fs_maxFoundFiles->integer] = NULL;
 
 	if (filter) {
 
 		nfiles = 0;
 		Sys_ListFilteredFiles( directory, "", filter, list, &nfiles );
 
-		list[ nfiles ] = 0;
+		list[ nfiles ] = NULL;
 		*numfiles = nfiles;
 
 		if (!nfiles)
+		{
+			Z_Free(list);
 			return NULL;
-
-		listCopy = (const char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ),TAG_LISTFILES,qfalse );
-		for ( i = 0 ; i < nfiles ; i++ ) {
-			listCopy[i] = list[i];
 		}
-		listCopy[i] = NULL;
 
-		return listCopy;
+		return list;
 	}
 
 	if ( !extension)
@@ -212,6 +210,7 @@ const char **Sys_ListFiles( const char *directory, const char *extension, char *
 
 	if ((fdir = opendir(directory)) == NULL) {
 		*numfiles = 0;
+		Z_Free(list);
 		return NULL;
 	}
 
@@ -232,13 +231,13 @@ const char **Sys_ListFiles( const char *directory, const char *extension, char *
 			}
 		}
 
-		if ( nfiles == MAX_FOUND_FILES - 1 )
+		if ( nfiles == fs_maxFoundFiles->integer - 1 )
 			break;
 		list[ nfiles ] = CopyString( d->d_name, TAG_LISTFILES );
 		nfiles++;
 	}
 
-	list[ nfiles ] = 0;
+	list[ nfiles ] = NULL;
 
 	closedir(fdir);
 
@@ -246,16 +245,11 @@ const char **Sys_ListFiles( const char *directory, const char *extension, char *
 	*numfiles = nfiles;
 
 	if ( !nfiles ) {
+		Z_Free(list);
 		return NULL;
 	}
 
-	listCopy = (const char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ),TAG_LISTFILES,qfalse );
-	for ( i = 0 ; i < nfiles ; i++ ) {
-		listCopy[i] = list[i];
-	}
-	listCopy[i] = NULL;
-
-	return listCopy;
+	return list;
 }
 
 void	Sys_FreeFileList( const char **list ) {

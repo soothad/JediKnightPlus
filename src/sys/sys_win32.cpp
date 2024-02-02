@@ -16,6 +16,8 @@
 #include <StackWalker.h>
 #endif
 
+extern cvar_t *fs_maxFoundFiles;
+
 void Sys_CrashSignalHandler(int signal);
 
 char *Sys_GetCurrentUser( void )
@@ -257,15 +259,13 @@ DIRECTORY SCANNING
 ==============================================================
 */
 
-#define	MAX_FOUND_FILES	0x1000
-
 static void Sys_ListFilteredFiles(const char *basedir, char *subdirs, char *filter, const char **psList, int *numfiles) {
 	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
 	char		filename[MAX_OSPATH];
 	HANDLE		findhandle;
 	WIN32_FIND_DATAA findinfo;
 
-	if (*numfiles >= MAX_FOUND_FILES - 1) {
+	if (*numfiles >= fs_maxFoundFiles->integer - 1) {
 		return;
 	}
 
@@ -291,7 +291,7 @@ static void Sys_ListFilteredFiles(const char *basedir, char *subdirs, char *filt
 				Sys_ListFilteredFiles(basedir, newsubdirs, filter, psList, numfiles);
 			}
 		}
-		if (*numfiles >= MAX_FOUND_FILES - 1) {
+		if (*numfiles >= fs_maxFoundFiles->integer - 1) {
 			break;
 		}
 		Com_sprintf(filename, sizeof(filename), "%s\\%s", subdirs, findinfo.cFileName);
@@ -315,31 +315,29 @@ unless they are NULL pointers
 const char **Sys_ListFiles(const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs) {
 	char		search[MAX_OSPATH];
 	int			nfiles;
-	const char	**listCopy;
-	const char	*list[MAX_FOUND_FILES];
+	const char	**list;
 	HANDLE		findhandle;
 	WIN32_FIND_DATAA findinfo;
 	int			flag;
-	int			i;
+
+	list = (const char **)Z_Malloc((fs_maxFoundFiles->integer + 1) * sizeof(*list), TAG_LISTFILES);
+	list[fs_maxFoundFiles->integer] = NULL;
 
 	if (filter) {
 
 		nfiles = 0;
 		Sys_ListFilteredFiles(directory, "", filter, list, &nfiles);
 
-		list[nfiles] = 0;
+		list[nfiles] = NULL;
 		*numfiles = nfiles;
 
 		if (!nfiles)
+		{
+			Z_Free(list);
 			return NULL;
-
-		listCopy = (const char **)Z_Malloc((nfiles + 1) * sizeof(*listCopy), TAG_LISTFILES);
-		for (i = 0; i < nfiles; i++) {
-			listCopy[i] = list[i];
 		}
-		listCopy[i] = NULL;
 
-		return listCopy;
+		return list;
 	}
 
 	if (!extension) {
@@ -362,12 +360,13 @@ const char **Sys_ListFiles(const char *directory, const char *extension, char *f
 	findhandle = FindFirstFileA(search, &findinfo);
 	if (findhandle == INVALID_HANDLE_VALUE) {
 		*numfiles = 0;
+		Z_Free(list);
 		return NULL;
 	}
 
 	do {
 		if ((!wantsubs && flag ^ (findinfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) || (wantsubs && findinfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			if (nfiles == MAX_FOUND_FILES - 1) {
+			if (nfiles == fs_maxFoundFiles->integer - 1) {
 				break;
 			}
 			list[nfiles] = CopyString(findinfo.cFileName, TAG_LISTFILES);
@@ -375,7 +374,7 @@ const char **Sys_ListFiles(const char *directory, const char *extension, char *f
 		}
 	} while (FindNextFileA(findhandle, &findinfo) != 0);
 
-	list[nfiles] = 0;
+	list[nfiles] = NULL;
 
 	FindClose(findhandle);
 
@@ -383,16 +382,11 @@ const char **Sys_ListFiles(const char *directory, const char *extension, char *f
 	*numfiles = nfiles;
 
 	if (!nfiles) {
+		Z_Free(list);
 		return NULL;
 	}
 
-	listCopy = (const char **)Z_Malloc((nfiles + 1) * sizeof(*listCopy), TAG_LISTFILES);
-	for (i = 0; i < nfiles; i++) {
-		listCopy[i] = list[i];
-	}
-	listCopy[i] = NULL;
-
-	return listCopy;
+	return list;
 }
 
 void	Sys_FreeFileList(const char **psList) {

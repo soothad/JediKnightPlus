@@ -244,6 +244,7 @@ static	cvar_t		*fs_copyfiles;
 static	cvar_t		*fs_gamedirvar;
 static	cvar_t		*fs_dirBeforePak; //rww - when building search path, keep directories at top and insert pk3's under them
 static	cvar_t		*fs_forcegame;
+cvar_t				*fs_maxFoundFiles;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
@@ -2134,8 +2135,6 @@ DIRECTORY SCANNING FUNCTIONS
 
 static void FS_SortFileList(const char **filelist, int numfiles);
 
-#define	MAX_FOUND_FILES	0x1000
-
 static int FS_ReturnPath( const char *zname, char *zpath, int *depth ) {
 	int len, at, newdep;
 
@@ -2164,10 +2163,10 @@ static int FS_ReturnPath( const char *zname, char *zpath, int *depth ) {
 FS_AddFileToList
 ==================
 */
-static int FS_AddFileToList( const char *name, const char *list[MAX_FOUND_FILES], int nfiles ) {
+static int FS_AddFileToList( const char *name, const char **list, int nfiles ) {
 	int		i;
 
-	if ( nfiles == MAX_FOUND_FILES - 1 ) {
+	if ( nfiles == fs_maxFoundFiles->integer - 1 ) {
 		return nfiles;
 	}
 	for ( i = 0 ; i < nfiles ; i++ ) {
@@ -2195,8 +2194,7 @@ compat is true, this behaviour is reproduced.
 */
 static const char **FS_ListFilteredFiles( const char *path, const char *extension, char *filter, int *numfiles, qboolean compat ) {
 	int				nfiles;
-	const char		**listCopy;
-	const char		*list[MAX_FOUND_FILES];
+	const char		**list;
 	searchpath_t	*search;
 	int				i;
 	int				pathLength;
@@ -2214,6 +2212,10 @@ static const char **FS_ListFilteredFiles( const char *path, const char *extensio
 		*numfiles = 0;
 		return NULL;
 	}
+
+	list = (const char **)Z_Malloc( ( fs_maxFoundFiles->integer + 1 ) * sizeof( *list ), TAG_FILESYS );
+	list[fs_maxFoundFiles->integer] = NULL;
+
 	if ( !extension ) {
 		extension = "";
 	}
@@ -2332,16 +2334,13 @@ static const char **FS_ListFilteredFiles( const char *path, const char *extensio
 	*numfiles = nfiles;
 
 	if ( !nfiles ) {
+		Z_Free(list);
 		return NULL;
 	}
 
-	listCopy = (const char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ), TAG_FILESYS );
-	for ( i = 0 ; i < nfiles ; i++ ) {
-		listCopy[i] = list[i];
-	}
-	listCopy[i] = NULL;
+	list[nfiles] = NULL;
 
-	return listCopy;
+	return list;
 }
 
 /*
@@ -3357,6 +3356,7 @@ static void FS_Startup( const char *gameName ) {
 	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 	fs_forcegame = Cvar_Get ("fs_forcegame", "base", CVAR_INIT );
 	fs_dirBeforePak = Cvar_Get ("fs_dirBeforePak", "1", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL );
+	fs_maxFoundFiles = Cvar_Get("fs_maxFoundFiles", "4096", CVAR_INIT | CVAR_VM_NOWRITE);
 
 	assetsPath = Sys_DefaultAssetsPath();
 	fs_assetspath = Cvar_Get("fs_assetspath", assetsPath ? assetsPath : "", CVAR_INIT | CVAR_VM_NOWRITE);
@@ -3898,6 +3898,7 @@ void FS_InitFilesystem( void ) {
 	Com_StartupVariable( "fs_restrict" );
 	Com_StartupVariable( "fs_forcegame" );
 	Com_StartupVariable( "fs_dirBeforePak" );
+	Com_StartupVariable( "fs_maxFoundFiles" );
 
 	// try to start up normally
 	FS_Startup( BASEGAME );
