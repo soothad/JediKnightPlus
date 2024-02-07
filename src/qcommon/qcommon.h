@@ -471,6 +471,7 @@ void	Cmd_ExecuteString( const char *text );
 // Parses a single line of text into arguments and tries to execute it
 // as if it was typed at the console
 
+bool	IsOpeningQuote(const char *quote, bool canLookBehind);
 
 /*
 ==============================================================

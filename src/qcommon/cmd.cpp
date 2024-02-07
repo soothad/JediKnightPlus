@@ -136,6 +136,14 @@ void Cbuf_ExecuteText (cbufExec_t exec_when, const char *text)
 	}
 }
 
+bool IsOpeningQuote(const char *quote, bool canLookBehind) {
+    const char *prev = canLookBehind ? quote - 1 : NULL;
+    const char *next = quote + 1;
+    if (quote && *quote == '"' && *next && !isspace((unsigned)*next) && *next != '"' && !(prev && *prev == '"') && *next != ';')
+        return true; // waaaaaaaaaaaaaaaaaaaaaaaaaaaaah it doesn't properly detect "" ; ";" " ;; ;;;;;;;;""" " "";" "; ;" " ";";;;"""""""""""""";; " ";";"" waaaaaaaaaaaaaaaaaaaaaaaaaaaaah
+    return false;
+}
+
 /*
 ============
 Cbuf_Execute

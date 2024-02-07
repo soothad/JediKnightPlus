@@ -1894,41 +1894,63 @@ CL_AddKeyUpCommands
 ===================
 */
 void CL_AddKeyUpCommands( int key, const char *kb, int time ) {
-	int i;
-	char button[1024], *buttonPtr;
-	char	cmd[1024];
-	qboolean keyevent;
+	char buf[ MAX_STRING_CHARS ], *p = buf, *end;
+	qboolean allCommands, allowUpCmds;
 
-	if ( !kb ) {
+	if ( kb == NULL ) {
 		return;
 	}
-	keyevent = qfalse;
-	buttonPtr = button;
-	for ( i = 0; ; i++ ) {
-		if ( kb[i] == ';' || !kb[i] ) {
-			*buttonPtr = '\0';
-			if ( button[0] == '+') {
-				// button commands add keynum and time as parms so that multiple
-				// sources can be discriminated and subframe corrected
-				Com_sprintf (cmd, sizeof(cmd), "-%s %i %i\n", button+1, key, time);
-				Cbuf_AddText (cmd);
-				keyevent = qtrue;
-			} else {
-				if (keyevent) {
-					// down-only command
-					Cbuf_AddText (button);
-					Cbuf_AddText ("\n");
-				}
-			}
-			buttonPtr = button;
-			while ( (kb[i] <= ' ' || kb[i] == ';') && kb[i] != 0 ) {
-				i++;
+
+	if( cls.state == CA_DISCONNECTED && Key_GetCatcher( ) == 0 )
+		return;
+
+	Q_strncpyz(buf, kb, sizeof(buf));
+	// run all bind commands if console, ui, etc aren't reading keys
+	allCommands = (qboolean)( Key_GetCatcher( ) == 0 );
+
+	// allow button up commands if in game even if key catcher is set
+	allowUpCmds = (qboolean)( cls.state != CA_DISCONNECTED );
+
+	// filter semicolons that aren't in quotes into magic chars, preserving semicolons that are in quotes
+	const char nonQuotedSemicolonMagicChar = '\x01';
+	//	bool inQuote = false;
+	int quotes = 0;
+	while (*p) {
+		if (*p == '"') {
+			if (IsOpeningQuote(p, p > buf))
+				++quotes;
+			else if (quotes)
+				--quotes;
+		}
+		else if (*p == ';' && !quotes) {
+			*p = nonQuotedSemicolonMagicChar;
+		}
+		p++;
+	}
+
+	p = buf;
+
+	while( 1 )
+	{
+		while( isspace( *p ) )
+			p++;
+		end = strchr( p, nonQuotedSemicolonMagicChar); // end commands at non-quoted semicolons
+		if( end )
+			*end = '\0';
+		if( *p == '+' )
+		{
+			// button commands add keynum and time as parameters
+			// so that multiple sources can be discriminated and
+			// subframe corrected
+			if ( allCommands || ( allowUpCmds ) ) {
+				char cmd[1024];
+				Com_sprintf( cmd, sizeof( cmd ), "-%s %d %d\n", p + 1, key, time );
+				Cbuf_AddText( cmd );
 			}
 		}
-		*buttonPtr++ = kb[i];
-		if ( !kb[i] ) {
+		if( !end )
 			break;
-		}
+		p = end + 1;
 	}
 }
 
