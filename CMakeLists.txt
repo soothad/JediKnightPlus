@@ -217,9 +217,9 @@ if(MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244 /wd4996 /wd4267")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996 /wd4267")
 	
-	# Multithreaded
-	set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-	set(CMAKE_C_FLAGS_RELEASE "/MT")
+	# Runtime Library: Multi-threaded DLL
+	set(CMAKE_CXX_FLAGS_RELEASE "/MD")
+	set(CMAKE_C_FLAGS_RELEASE "/MD")
 
 	# Platform
 	set(GlobalDefines ${GlobalDefines} "UNICODE" "_UNICODE")
