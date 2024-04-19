@@ -493,6 +493,10 @@ Ghoul2 Insert End
 	// True if this shader has a stage with glow in it (just an optimization).
 	qboolean hasGlow;
 
+	// qtrue if shader name is models/players/*/icon_*
+	// example: models/players/jedi_tf/icon_head_a1
+	qboolean isPlayerIcon;
+
 	struct shader_s *remappedShader;                  // current shader this one is remapped too
 
 	struct	shader_s	*next;
@@ -1306,6 +1310,7 @@ extern	cvar_t *r_textureLODBias;
 extern	cvar_t *r_saberGlow;
 extern	cvar_t *r_environmentMapping;
 extern	cvar_t *r_printMissingModels;
+extern	cvar_t *r_fixPlayerIconBrightness;
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, double t );

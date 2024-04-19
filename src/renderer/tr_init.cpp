@@ -195,6 +195,7 @@ cvar_t *r_textureLODBias;
 cvar_t *r_saberGlow;
 cvar_t *r_environmentMapping;
 cvar_t *r_printMissingModels;
+cvar_t *r_fixPlayerIconBrightness;
 
 #ifndef DEDICATED
 PFNGLACTIVETEXTUREARBPROC qglActiveTextureARB;
@@ -1249,6 +1250,7 @@ Ghoul2 Insert End
 	r_saberGlow = ri.Cvar_Get("r_saberGlow", "1", CVAR_ARCHIVE | CVAR_LATCH);
 	r_environmentMapping = ri.Cvar_Get("r_environmentMapping", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_printMissingModels = ri.Cvar_Get("r_printMissingModels", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
+	r_fixPlayerIconBrightness = ri.Cvar_Get("r_fixPlayerIconBrightness", "1", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
 }
 
 #ifdef G2_COLLISION_ENABLED
