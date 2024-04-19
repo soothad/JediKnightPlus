@@ -245,6 +245,7 @@ static	cvar_t		*fs_gamedirvar;
 static	cvar_t		*fs_dirBeforePak; //rww - when building search path, keep directories at top and insert pk3's under them
 static	cvar_t		*fs_forcegame;
 cvar_t				*fs_maxFoundFiles;
+static	cvar_t		*r_autoOverBrightBits;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
@@ -1412,6 +1413,18 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 					if ( fs_debug->integer ) {
 						Com_Printf( "FS_FOpenFileRead: %s (found in '%s')\n",
 							filename, pak->pakFilename );
+					}
+
+					if (r_autoOverBrightBits->integer && Q_stricmp(get_filename_ext(filename), "bsp") == 0)
+					{
+						if (pak->isJKA)
+						{
+							Cvar_Set("r_overBrightBits", "0");
+						}
+						else
+						{
+							Cvar_Set("r_overBrightBits", "1");
+						}
 					}
 #ifndef DEDICATED
 #ifndef FINAL_BUILD
@@ -3357,6 +3370,7 @@ static void FS_Startup( const char *gameName ) {
 	fs_forcegame = Cvar_Get ("fs_forcegame", "base", CVAR_INIT );
 	fs_dirBeforePak = Cvar_Get ("fs_dirBeforePak", "1", CVAR_INIT | CVAR_VM_NOWRITE );
 	fs_maxFoundFiles = Cvar_Get("fs_maxFoundFiles", "16384", CVAR_INIT | CVAR_VM_NOWRITE);
+	r_autoOverBrightBits = Cvar_Get("r_autoOverBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	assetsPath = Sys_DefaultAssetsPath();
 	fs_assetspath = Cvar_Get("fs_assetspath", assetsPath ? assetsPath : "", CVAR_INIT | CVAR_VM_NOWRITE);
