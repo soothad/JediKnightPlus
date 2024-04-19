@@ -1364,7 +1364,7 @@ void RE_Shutdown( qboolean destroyWindow ) {
 
 	ri.Printf( PRINT_ALL, "RE_Shutdown( %i )\n", destroyWindow );
 
-
+#ifndef DEDICATED
 	ri.Cmd_RemoveCommand ("imagelist");
 	ri.Cmd_RemoveCommand ("shaderlist");
 	ri.Cmd_RemoveCommand ("skinlist");
@@ -1373,10 +1373,11 @@ void RE_Shutdown( qboolean destroyWindow ) {
 	ri.Cmd_RemoveCommand ("gfxinfo");
 	ri.Cmd_RemoveCommand ("r_we");
 	ri.Cmd_RemoveCommand ("imagecacheinfo");
-
+	ri.Cmd_RemoveCommand ("remapSky");
+	ri.Cmd_RemoveCommand ("clearRemaps");
+#endif
 	ri.Cmd_RemoveCommand ("modellist");
 	ri.Cmd_RemoveCommand ("modelcacheinfo");
-
 
 #ifndef DEDICATED
 	if ( r_DynamicGlow && r_DynamicGlow->integer )
