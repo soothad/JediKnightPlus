@@ -1417,11 +1417,12 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 
 					if (r_autoOverBrightBits->integer && Q_stricmp(get_filename_ext(filename), "bsp") == 0)
 					{
-						if (pak->isJKA)
+						int bits = Cvar_VariableIntegerValue("r_overBrightBits");
+						if (pak->isJKA && bits != 0)
 						{
 							Cvar_Set("r_overBrightBits", "0");
 						}
-						else
+						else if (!pak->isJKA && bits != 1)
 						{
 							Cvar_Set("r_overBrightBits", "1");
 						}
