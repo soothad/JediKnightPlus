@@ -493,7 +493,7 @@ Ghoul2 Insert End
 	// True if this shader has a stage with glow in it (just an optimization).
 	qboolean hasGlow;
 
-	// qtrue if shader name is models/players/*/icon_*
+	// qtrue if shader name is "models/players/*/icon_*" or "models/players/*/mb2_icon_*"
 	// example: models/players/jedi_tf/icon_head_a1
 	qboolean isPlayerIcon;
 

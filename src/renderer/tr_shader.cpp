@@ -2153,11 +2153,12 @@ static qboolean ParseShader( const char **text )
 
 	// check for player icon
 	// models/players/*/icon_*
+	// models/players/*/mb2_icon_*
 	shader.isPlayerIcon = qfalse;
 	if (Q_stricmpn(shader.name, "models/players/", 15) == 0 && shader.name[15] != '\0' && shader.name[15] != '/')
 	{
 		char *p = strchr(&shader.name[15], '/');
-		if (p != NULL && Q_stricmpn(&p[1], "icon_", 5) == 0)
+		if (p != NULL && (Q_stricmpn(&p[1], "icon_", 5) == 0 || Q_stricmpn(&p[1], "mb2_icon_", 9) == 0))
 		{
 			if (strchr(&p[1], '/') == NULL)
 			{
