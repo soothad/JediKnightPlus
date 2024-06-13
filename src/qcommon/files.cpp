@@ -3524,17 +3524,17 @@ static void FS_Startup( const char *gameName ) {
 		}
 	}
 
-	if (f_w) {
-		FS_FCloseFile(f_w);
-		Hunk_FreeTempMemory(mv_whitelist);
+	if (f_f) {
+		FS_FCloseFile(f_f);
+		Hunk_FreeTempMemory(mv_forcelist);
 	}
 	if (f_b) {
 		FS_FCloseFile(f_b);
 		Hunk_FreeTempMemory(mv_blacklist);
 	}
-	if (f_f) {
-		FS_FCloseFile(f_f);
-		Hunk_FreeTempMemory(mv_forcelist);
+	if (f_w) {
+		FS_FCloseFile(f_w);
+		Hunk_FreeTempMemory(mv_whitelist);
 	}
 
 	Com_Printf( "----------------------\n" );
