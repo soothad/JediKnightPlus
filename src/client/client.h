@@ -357,8 +357,6 @@ typedef struct {
 	int			fixes;
 	qboolean	submodelBypass;
 
-	int			cs_remaps;
-
 	//EternalJK2MV
 	struct {
 		fileHandle_t	chat;
@@ -519,7 +517,6 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 
 void CL_GetVMGLConfig(vmglconfig_t *vmglconfig);
 int CL_ScaledMilliseconds(void);
-void CL_ShaderStateChanged( void );
 
 //EternalJK2MV
 void CL_RandomizeColors(const char* in, char *out);

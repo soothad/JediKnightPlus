@@ -384,6 +384,11 @@ static shader_t *ShaderForShaderNum( int shaderNum, const int *lightmapNum, cons
 
 	shader = R_FindShader( dsh->shader, lightmapNum, styles, qtrue );
 
+	// if the shader had errors, just use default shader
+	if ( shader->defaultShader ) {
+		return tr.defaultShader;
+	}
+
 	return shader;
 }
 
