@@ -64,14 +64,14 @@ char *Sys_DefaultAssetsPath() {
 	// force 32bit registry
 	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\LucasArts Entertainment Company LLC\\Star Wars JK II Jedi Outcast\\1.0",
 		0, KEY_WOW64_32KEY|KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS) {
-		return NULL;
+		return "";
 	}
 
 	installPathSize = sizeof(installPath);
 	if (RegQueryValueExA(hKey, "Install Path", NULL, NULL, (LPBYTE)installPath, &installPathSize) != ERROR_SUCCESS) {
 		if (RegQueryValueExA(hKey, "InstallPath", NULL, NULL, (LPBYTE)installPath, &installPathSize) != ERROR_SUCCESS) {
 			RegCloseKey(hKey);
-			return NULL;
+			return "";
 		}
 	}
 
@@ -93,14 +93,14 @@ char *Sys_DefaultAssetsPathJKA() {
 	// force 32bit registry
 	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\LucasArts\\Star Wars Jedi Knight Jedi Academy\\1.0",
 		0, KEY_WOW64_32KEY|KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS) {
-		return NULL;
+		return "";
 	}
 
 	installPathSize = sizeof(installPath);
 	if (RegQueryValueExA(hKey, "Install Path", NULL, NULL, (LPBYTE)installPath, &installPathSize) != ERROR_SUCCESS) {
 		if (RegQueryValueExA(hKey, "InstallPath", NULL, NULL, (LPBYTE)installPath, &installPathSize) != ERROR_SUCCESS) {
 			RegCloseKey(hKey);
-			return NULL;
+			return "";
 		}
 	}
 
@@ -108,7 +108,7 @@ char *Sys_DefaultAssetsPathJKA() {
 	Q_strcat(installPath, sizeof(installPath), "\\GameData");
 	return installPath;
 #else
-	return NULL;
+	return "";
 #endif
 }
 

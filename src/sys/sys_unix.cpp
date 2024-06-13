@@ -422,28 +422,28 @@ char *Sys_DefaultAssetsPath() {
 
     uint32_t size = sizeof(path);
     if (_NSGetExecutablePath(path, &size)) {
-        return NULL;
+        return "";
     }
 
     override = last_strstr(path, ".app/");
     if (!override) {
-        return NULL;
+        return "";
     }
     *override = 0;
 
     override = last_strstr(path, "/");
     if (!override) {
-        return NULL;
+        return "";
     }
 
     strcpy(override, "/Jedi Knight II.app/Contents");
     if (access(va("%s/base/assets0.pk3", path), F_OK) == -1) {
-        return NULL;
+        return "";
     }
 
     return path;
 #else
-    return NULL;
+    return "";
 #endif
 }
 
@@ -469,28 +469,28 @@ char *Sys_DefaultAssetsPathJKA() {
 
     uint32_t size = sizeof(path);
     if (_NSGetExecutablePath(path, &size)) {
-        return NULL;
+        return "";
     }
 
     ptr = last_strstr(path, ".app/");
     if (!ptr) {
-        return NULL;
+        return "";
     }
     *ptr = 0;
 
     ptr = last_strstr(path, "/");
     if (!ptr) {
-        return NULL;
+        return "";
     }
 
     strcpy(ptr, "/SWJKA.app/Contents");
     if (access(va("%s/base/assets0.pk3", path), F_OK) == -1) {
-        return NULL;
+        return "";
     }
 
     return path;
 #else
-    return NULL;
+    return "";
 #endif
 }
 

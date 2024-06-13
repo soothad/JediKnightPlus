@@ -246,6 +246,7 @@ static	cvar_t		*fs_dirBeforePak; //rww - when building search path, keep directo
 static	cvar_t		*fs_forcegame;
 cvar_t				*fs_maxFoundFiles;
 static	cvar_t		*r_autoOverBrightBits;
+static	cvar_t		*fs_directories;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
@@ -3003,16 +3004,14 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 	//
 	// add the directory to the search path
 	//
-	if (!assetsJK2 && !assetsJKA) {
-		search = (struct searchpath_s *)Z_Malloc(sizeof(searchpath_t), TAG_FILESYS, qtrue);
-		search->dir = (directory_t *)Z_Malloc(sizeof(*search->dir), TAG_FILESYS, qtrue);
+	search = (struct searchpath_s *)Z_Malloc(sizeof(searchpath_t), TAG_FILESYS, qtrue);
+	search->dir = (directory_t *)Z_Malloc(sizeof(*search->dir), TAG_FILESYS, qtrue);
 
-		Q_strncpyz(search->dir->path, path, sizeof(search->dir->path));
-		Q_strncpyz(search->dir->gamedir, dir, sizeof(search->dir->gamedir));
-		search->next = fs_searchpaths;
-		fs_searchpaths = search;
-		thedir = search;
-	}
+	Q_strncpyz(search->dir->path, path, sizeof(search->dir->path));
+	Q_strncpyz(search->dir->gamedir, dir, sizeof(search->dir->gamedir));
+	search->next = fs_searchpaths;
+	fs_searchpaths = search;
+	thedir = search;
 
 	// find all pak files in this directory
 	pakfile = FS_BuildOSPath( path, dir, "" );
@@ -3029,13 +3028,6 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 	for ( i = 0 ; i < numfiles ; i++ ) {
 		pakfile = FS_BuildOSPath( path, dir, pakfiles[i] );
 		filename = get_filename(pakfile);
-
-		if (assetsJK2) {
-			if (strcmp(filename, "assets0.pk3") && strcmp(filename, "assets1.pk3") &&
-				strcmp(filename, "assets2.pk3") && strcmp(filename, "assets5.pk3")) {
-				continue;
-			}
-		}
 
 		if ( ( pak = FS_LoadZipFile( pakfile, pakfiles[i], assetsJKA ) ) == 0 )
 			continue;
@@ -3345,59 +3337,8 @@ void FS_Shutdown( qboolean closemfp, qboolean keepModuleFiles ) {
 	Cmd_RemoveCommand( "fs_restart" );
 }
 
-/*
-================
-FS_Startup
-================
-*/
-static void FS_Startup( const char *gameName ) {
-	const char *assetsPath;
-	const char *assetsPathJKA;
-	// Silence clang, they do get initialized
-	char *mv_whitelist = NULL, *mv_blacklist = NULL, *mv_forcelist = NULL;
-	fileHandle_t f_w, f_b, f_f;
-	int f_wl, f_bl, f_fl;
-	int s;
-	searchpath_t *search;
-
-	Com_Printf( "----- FS_Startup -----\n" );
-
-	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
-	fs_copyfiles = Cvar_Get( "fs_copyfiles", "0", CVAR_INIT );
-	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT | CVAR_VM_NOWRITE );
-	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
-	fs_homepath = Cvar_Get ("fs_homepath", Sys_DefaultHomePath(), CVAR_INIT | CVAR_VM_NOWRITE );
-	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-	fs_forcegame = Cvar_Get ("fs_forcegame", "base", CVAR_INIT );
-	fs_dirBeforePak = Cvar_Get ("fs_dirBeforePak", "1", CVAR_INIT | CVAR_VM_NOWRITE );
-	fs_maxFoundFiles = Cvar_Get("fs_maxFoundFiles", "16384", CVAR_INIT | CVAR_VM_NOWRITE);
-	r_autoOverBrightBits = Cvar_Get("r_autoOverBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
-
-	assetsPath = Sys_DefaultAssetsPath();
-	fs_assetspath = Cvar_Get("fs_assetspath", assetsPath ? assetsPath : "", CVAR_INIT | CVAR_VM_NOWRITE);
-
-	assetsPathJKA = Sys_DefaultAssetsPathJKA();
-	fs_assetspathjka = Cvar_Get("fs_assetspathjka", assetsPathJKA ? assetsPathJKA : "", CVAR_INIT | CVAR_VM_NOWRITE);
-	fs_basejka = Cvar_Get("fs_basejka", fs_assetspathjka->string[0] ? "base" : "basejka", CVAR_INIT | CVAR_VM_NOWRITE);
-
-	fs_loadjka = Cvar_Get("fs_loadjka", "1", CVAR_ARCHIVE | CVAR_LATCH);
-
-	if (!FS_AllPath_Base_FileExists("assets5.pk3")) {
-		// assets files found in none of the paths
-#if defined(INSTALLED)
-#ifdef WIN32
-		Com_Error(ERR_FATAL, "could not find JK2 installation... make sure you have JK2 installed (CD or Steam).");
-#elif MACOS_X
-		Com_Error(ERR_FATAL, "could not find JK2 App... put it either in /Applications or side by side with the JK2MV app.");
-#else
-		Com_Error(ERR_FATAL, "could not find assets(0,1,2,5).pk3 files... copy them into the base directory (%s/base or %s/base).", fs_basepath->string, fs_homepath->string);
-#endif
-#else
-		Com_Error(ERR_FATAL, "could not find assets(0,1,2,5).pk3 files... copy them into the base directory.");
-#endif
-		return;
-	}
-
+static void FS_AddGameDirectories(const char *gameName)
+{
 	// Try to load JKA assets if a path has been specified
 	if ( fs_loadjka->integer && fs_basejka->string[0] ) {
 		if (fs_assetspathjka->string[0]) {
@@ -3459,6 +3400,142 @@ static void FS_Startup( const char *gameName ) {
 			}
 		}
 		Q_strncpyz( fs_gamedir, fs_forcegame->string, sizeof( fs_gamedir ) );
+	}
+}
+
+static void FS_AddGameDirectories2(void)
+{
+	FILE *filePointer;
+	long int fileSize;
+	int fseekResult;
+	char *fileBuffer;
+	const char *fileBufferPointer;
+	size_t freadResult;
+	char *token;
+	qboolean isDirectoryJK2;
+	qboolean isDirectoryJKA;
+	char gamePath[MAX_TOKEN_CHARS];      // C:\jk2
+	char gameDirectory[MAX_TOKEN_CHARS]; // C:\jk2\base
+	filePointer = fopen(fs_directories->string, "rb");
+	if (filePointer == NULL)
+	{
+		return;
+	}
+	fseekResult = fseek(filePointer, 0L, SEEK_END);
+	if (fseekResult != 0)
+	{
+		goto close;
+	}
+	fileSize = ftell(filePointer);
+	if (fileSize <= 0)
+	{
+		goto close;
+	}
+	fseekResult = fseek(filePointer, 0L, SEEK_SET);
+	if (fseekResult != 0)
+	{
+		goto close;
+	}
+	fileBuffer = (char *) malloc(sizeof(char) * (fileSize + 1UL));
+	if (fileBuffer == NULL)
+	{
+		goto close;
+	}
+	freadResult = fread(fileBuffer, sizeof(char), fileSize, filePointer);
+	if (freadResult != fileSize)
+	{
+		goto free;
+	}
+	fileBuffer[fileSize] = '\0';
+	COM_BeginParseSession(fs_directories->string);
+	fileBufferPointer = fileBuffer;
+	while (true)
+	{
+		token = COM_Parse(&fileBufferPointer);
+		if (token == NULL || token[0] == '\0')
+		{
+			break;
+		}
+		if (Q_stricmp(token, "jk2") == 0)
+		{
+			isDirectoryJK2 = qtrue;
+			isDirectoryJKA = qfalse;
+		}
+		else if (Q_stricmp(token, "jka") == 0)
+		{
+			isDirectoryJK2 = qfalse;
+			isDirectoryJKA = qtrue;
+		}
+		else
+		{
+			COM_ParseError("Expected \"jk2\" or \"jka\", found \"%s\"", token);
+			goto free;
+		}
+		token = COM_Parse(&fileBufferPointer);
+		if (token == NULL || token[0] == '\0')
+		{
+			COM_ParseError("Expected game directory, found \"end of file\"");
+			goto free;
+		}
+		Q_strncpyz(gameDirectory, token, sizeof(gameDirectory));
+		token = COM_Parse(&fileBufferPointer);
+		if (token == NULL || token[0] == '\0')
+		{
+			COM_ParseError("Expected game path, found \"end of file\"");
+			goto free;
+		}
+		Q_strncpyz(gamePath, token, sizeof(gamePath));
+		FS_AddGameDirectory(gamePath, gameDirectory, isDirectoryJK2, isDirectoryJKA);
+	}
+	Cvar_Set("fs_basepath", gamePath);
+	Cvar_Set("fs_basegame", gameDirectory);
+	Cvar_Set("fs_homepath", gamePath);
+	Cvar_Set("fs_game", gameDirectory);
+	Cvar_Set("fs_forcegame", gameDirectory);
+	Cvar_Set("fs_assetspath", gamePath);
+	Cvar_Set("fs_assetspathjka", gamePath);
+	Cvar_Set("fs_basejka", "basejka");
+free:
+	free(fileBuffer);
+close:
+	fclose(filePointer);
+}
+
+/*
+================
+FS_Startup
+================
+*/
+static void FS_Startup( const char *gameName ) {
+	// Silence clang, they do get initialized
+	char *mv_whitelist = NULL, *mv_blacklist = NULL, *mv_forcelist = NULL;
+	fileHandle_t f_w, f_b, f_f;
+	int f_wl, f_bl, f_fl;
+	int s;
+	searchpath_t *search;
+
+	Com_Printf( "----- FS_Startup -----\n" );
+
+	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
+	fs_copyfiles = Cvar_Get( "fs_copyfiles", "0", CVAR_INIT );
+	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT | CVAR_VM_NOWRITE );
+	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
+	fs_homepath = Cvar_Get ("fs_homepath", Sys_DefaultHomePath(), CVAR_INIT | CVAR_VM_NOWRITE );
+	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	fs_forcegame = Cvar_Get ("fs_forcegame", "base", CVAR_INIT );
+	fs_dirBeforePak = Cvar_Get ("fs_dirBeforePak", "1", CVAR_INIT | CVAR_VM_NOWRITE );
+	fs_maxFoundFiles = Cvar_Get("fs_maxFoundFiles", "16384", CVAR_INIT | CVAR_VM_NOWRITE);
+	r_autoOverBrightBits = Cvar_Get("r_autoOverBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	fs_directories = Cvar_Get("fs_directories", "directories.txt", CVAR_INIT | CVAR_VM_NOWRITE);
+	fs_assetspath = Cvar_Get("fs_assetspath", Sys_DefaultAssetsPath(), CVAR_INIT | CVAR_VM_NOWRITE);
+	fs_assetspathjka = Cvar_Get("fs_assetspathjka", Sys_DefaultAssetsPathJKA(), CVAR_INIT | CVAR_VM_NOWRITE);
+	fs_basejka = Cvar_Get("fs_basejka", fs_assetspathjka->string[0] ? "base" : "basejka", CVAR_INIT | CVAR_VM_NOWRITE);
+	fs_loadjka = Cvar_Get("fs_loadjka", "1", CVAR_ARCHIVE | CVAR_LATCH);
+
+	FS_AddGameDirectories2();
+	if (fs_searchpaths == NULL)
+	{
+		FS_AddGameDirectories(gameName);
 	}
 
 	// add our commands
