@@ -78,7 +78,7 @@ R_ColorShiftLightingBytes
 
 ===============
 */
-static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
+static	void R_ColorShiftLightingBytes( byte in[4], byte out[4] ) {
 	int		shift, r, g, b;
 
 	// shift the color data based on overbright range
@@ -89,6 +89,7 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 		out[0] = in[0];
 		out[1] = in[1];
 		out[2] = in[2];
+		out[3] = in[3];
 		return;
 	}
 
@@ -111,10 +112,6 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 	out[0] = r;
 	out[1] = g;
 	out[2] = b;
-}
-
-static	void R_ColorShiftLightingBytes( const byte in[4], byte out[4] ) {
-	R_ColorShiftLightingBytes3(in, out);
 	out[3] = in[3];
 }
 
@@ -169,9 +166,9 @@ R_LoadLightmaps
 #define	LIGHTMAPS_PER_ATLAS (LIGHTMAPS_PER_ATLAS_DIMENSION * LIGHTMAPS_PER_ATLAS_DIMENSION)
 
 static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
-	const byte		*buf, *buf_p;
+	byte		*buf, *buf_p;
 	int			len;
-	byte		image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*3];
+	byte		image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*4];
 	int			i, j;
 	float maxIntensity = 0;
 	double sumIntensity = 0;
@@ -205,7 +202,7 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 
 	// create empty lightmap atlases
 	int numberOfAtlases = ceil(tr.numLightmaps / (float)LIGHTMAPS_PER_ATLAS);
-	byte *emptyAtlas = (byte*)ri.Hunk_AllocateTempMemory(LIGHTMAP_ATLAS_SIZE * LIGHTMAP_ATLAS_SIZE * 3);
+	byte *emptyAtlas = (byte*)ri.Hunk_AllocateTempMemory(LIGHTMAP_ATLAS_SIZE * LIGHTMAP_ATLAS_SIZE * 4);
 	for (i = 0; i < numberOfAtlases; i++)
 		tr.lightmaps[i] = R_CreateImage(
 			va("*%s/lmAtlas%d", sMapName, i),
@@ -214,11 +211,11 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 			qfalse,
 			qfalse,
 			(qboolean)!!r_ext_compressed_lightmaps->integer,
-			GL_CLAMP,
-			PXF_RGB);
+			GL_CLAMP);
 	ri.Hunk_FreeTempMemory(emptyAtlas);
 
 	for ( i = 0 ; i < tr.numLightmaps ; i++ ) {
+		// expand the 24 bit on-disk to 32 bit
 		buf_p = buf + i * LIGHTMAP_SIZE*LIGHTMAP_SIZE * 3;
 
 		if ( r_lightmap->integer == 2 )
@@ -243,15 +240,17 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 
 				HSVtoRGB( intensity, 1.00, 0.50, out );
 
-				image[j*3+0] = out[0] * 255;
-				image[j*3+1] = out[1] * 255;
-				image[j*3+2] = out[2] * 255;
+				image[j*4+0] = out[0] * 255;
+				image[j*4+1] = out[1] * 255;
+				image[j*4+2] = out[2] * 255;
+				image[j*4+3] = 255;
 
 				sumIntensity += intensity;
 			}
 		} else {
 			for ( j = 0 ; j < LIGHTMAP_SIZE * LIGHTMAP_SIZE; j++ ) {
-				R_ColorShiftLightingBytes3( &buf_p[j*3], &image[j*3] );
+				R_ColorShiftLightingBytes( &buf_p[j*3], &image[j*4] );
+				image[j*4+3] = 255;
 			}
 		}
 
@@ -271,7 +270,7 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 			yoff,
 			LIGHTMAP_SIZE,
 			LIGHTMAP_SIZE,
-			GL_RGB,
+			GL_RGBA,
 			GL_UNSIGNED_BYTE,
 			image
 		);

@@ -189,7 +189,7 @@ or configs will never get loaded from disk!
 #define MAX_FILEHASH_SIZE	1024
 
 typedef struct fileInPack_s {
-	const char				*name;		// name of the file
+	char					*name;		// name of the file
 	unsigned int			pos;		// file info position in zip
 	unsigned int			len;		// uncompress file size
 	struct	fileInPack_s*	next;		// next file in the hash
@@ -1983,9 +1983,11 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 	char			filename_inzip[MAX_ZPATH];
 	unz_file_info	file_info;
 	ZPOS64_T		i;
+	size_t			len;
 	int			hash;
 	int				fs_numHeaderLongs;
 	int				*fs_headerLongs;
+	char			*namePtr;
 	int				strLength;
 
 	fs_numHeaderLongs = 0;
@@ -1998,7 +2000,31 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 
 	fs_packFiles += gi.number_entry;
 
-	buildBuffer = (struct fileInPack_s *)Z_Malloc((int)((gi.number_entry * sizeof(fileInPack_t))), TAG_FILESYS, qtrue);
+	len = 0;
+	unzGoToFirstFile(uf);
+	for (i = 0; i < gi.number_entry; i++)
+	{
+		err = unzGetCurrentFileInfo(uf, &file_info, filename_inzip, sizeof(filename_inzip), NULL, 0, NULL, 0);
+		if (err != UNZ_OK) {
+			break;
+		}
+		strLength = strlen(filename_inzip);
+		if ( assetsJKA ) {
+			// Ugly workarounds:
+			//  - rename academy shader files to avoid collisions
+			//  - rename academy sounds.cfg files to prevent them from overriding sounds of jk2 models that don't have a sounds.cfg
+			if ( strLength > 7 && !Q_stricmp(filename_inzip + strLength - 7, ".shader") ) {
+				len += 4; // "_jka"
+			} else if ( strLength > 15 && !Q_stricmpn(filename_inzip, "models/players/", 15) && !Q_stricmp(filename_inzip + strLength - 11, "/sounds.cfg") ) {
+				len += 4; // "_jka"
+			}
+		}
+		len += strLength + 1;
+		unzGoToNextFile(uf);
+	}
+
+	buildBuffer = (struct fileInPack_s *)Z_Malloc((int)((gi.number_entry * sizeof(fileInPack_t)) + len), TAG_FILESYS, qtrue);
+	namePtr = ((char *) buildBuffer) + gi.number_entry * sizeof( fileInPack_t );
 	fs_headerLongs = (int *)Z_Malloc( gi.number_entry * sizeof(int), TAG_FILESYS, qtrue );
 
 	// get the hash table size from the number of files in the zip
@@ -2050,7 +2076,9 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 		}
 		Q_strlwr( filename_inzip );
 		hash = FS_HashFileName(filename_inzip, pack->hashSize);
-		buildBuffer[i].name = CopyString(filename_inzip, TAG_FILESYS);
+		buildBuffer[i].name = namePtr;
+		strcpy( buildBuffer[i].name, filename_inzip );
+		namePtr += strlen(filename_inzip) + 1;
 		// store the file position in the zip
 		buildBuffer[i].pos = unzGetOffset(uf);
 		buildBuffer[i].len = file_info.uncompressed_size;
@@ -2253,7 +2281,7 @@ static const char **FS_ListFilteredFiles( const char *path, const char *extensio
 			pak = search->pack;
 			buildBuffer = pak->buildBuffer;
 			for (i = 0; i < pak->numfiles; i++) {
-				const char	*name;
+				char	*name;
 				int		zpathLen, depth;
 
 				// check for directory match
@@ -3037,7 +3065,6 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 			if (!found) {
 				// server has no interest in the file
 				unzClose(pak->handle);
-				Z_Free((void *)pak->buildBuffer->name);
 				Z_Free(pak->buildBuffer);
 				Z_Free(pak);
 				continue;
@@ -3305,7 +3332,6 @@ void FS_Shutdown( qboolean closemfp, qboolean keepModuleFiles ) {
 
 		if ( p->pack ) {
 			unzClose(p->pack->handle);
-			Z_Free( (void *)p->pack->buildBuffer->name );
 			Z_Free( p->pack->buildBuffer );
 			Z_Free( p->pack );
 		}
