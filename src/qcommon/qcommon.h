@@ -829,6 +829,7 @@ extern	cvar_t	*mv_apienabled;
 extern	cvar_t	*com_debugMessage;
 
 extern	cvar_t	*com_renderfps;
+extern	cvar_t	*com_exitOnError;
 
 // both client and server must agree to pause
 extern	cvar_t	*cl_paused;

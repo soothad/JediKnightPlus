@@ -79,6 +79,7 @@ cvar_t	*com_priority;
 
 cvar_t	*com_renderfps;
 cvar_t	*cl_commandsize;//Loda - FPS UNLOCK ENGINE
+cvar_t	*com_exitOnError;
 
 // com_speeds times
 int		time_game;
@@ -317,6 +318,11 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
 	// when we are running automated scripts, make sure we
 	// know if anything failed
 	if ( com_buildScript && com_buildScript->integer ) {
+		code = ERR_FATAL;
+	}
+
+	if (com_exitOnError->integer)
+	{
 		code = ERR_FATAL;
 	}
 
@@ -2611,6 +2617,7 @@ void Com_Init( char *commandLine ) {
 	Cvar_Get("com_ignoreothertasks", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	com_renderfps = Cvar_Get("com_renderfps", "0", CVAR_ARCHIVE);
+	com_exitOnError = Cvar_Get("com_exitOnError", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_commandsize = Cvar_Get("cl_commandsize", "64", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
 
 	mv_apienabled = Cvar_Get("mv_apienabled", Q_XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
