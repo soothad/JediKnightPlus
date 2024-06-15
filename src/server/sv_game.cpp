@@ -1163,7 +1163,7 @@ static void SV_InitGameVM( qboolean restart ) {
 	mvStructConversionDisabled = qfalse;
 
 	apireq = VM_Call(gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart,
-		0, 0, 0, 0, 0, 0, 0, 0, MIN(mv_apienabled->integer, MV_APILEVEL));
+		0, 0, 0, 0, 0, 0, 0, 0, mv_apienabled->integer);
 	if (apireq > mv_apienabled->integer) {
 		apireq = mv_apienabled->integer;
 	}

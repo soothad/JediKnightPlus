@@ -1478,7 +1478,7 @@ jk2mv has it's own dll for the main menu
 void CL_InitUI(qboolean mainMenu) {
 	vmInterpret_t		interpret;
 	int v;
-	int apilevel = MIN(mv_apienabled->integer, MV_APILEVEL);
+	int apilevel = mv_apienabled->integer;
 
 	// mv_menuOverride  1 -> force ui module everywhere
 	// mv_menuOverride  0 -> mvmenu on main menu; ui module ingame
@@ -1499,8 +1499,6 @@ void CL_InitUI(qboolean mainMenu) {
 
 	// Load the mvmenu if we want the mainMenu or failed to load a ui module earlier
 	if ( (mainMenu && !mv_menuOverride->integer) || mv_menuOverride->integer == -1 || !uivm ) {
-		apilevel = MV_APILEVEL;
-
 		uivm = VM_Create("jk2mvmenu", qtrue, CL_UISystemCalls, VMI_NATIVE);
 		VM_SetGameversion(uivm, VERSION_UNDEF);
 	}
