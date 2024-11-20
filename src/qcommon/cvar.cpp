@@ -14,6 +14,8 @@ int			cvar_numIndexes;
 #define FILE_HASH_SIZE		256
 static	cvar_t*		hashTable[FILE_HASH_SIZE];
 
+cvar_t *com_overrideCheats; //Lom v24
+
 cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force);
 
 /*
@@ -415,7 +417,8 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 			return var;
 		}
 
-		if ( (var->flags & CVAR_CHEAT) && !cvar_cheats->integer && !com_demoplaying ) //Allow modifying cheat cvars during demo playback.
+		//if ( (var->flags & CVAR_CHEAT) && !cvar_cheats->integer && !com_demoplaying ) //Allow modifying cheat cvars during demo playback.
+		if ((var->flags & CVAR_CHEAT) && !com_overrideCheats->integer && !cvar_cheats->integer && !com_demoplaying) //Allow modifying cheat cvars during demo playback. //James: Lom v24 code replacing vanilla code.
 		{
 			Com_Printf ("%s is cheat protected.\n", var_name);
 			return var;
@@ -522,6 +525,11 @@ Any testing variables will be reset to the safe values
 */
 void Cvar_SetCheatState( void ) {
 	cvar_t	*var;
+
+	if (com_overrideCheats->integer) //Lom v24
+	{
+		return;
+	}
 
 	// set all default vars to the safe value
 	for ( var = cvar_vars ; var ; var = var->next ) {
@@ -1258,6 +1266,7 @@ Reads in all archived cvars
 */
 void Cvar_Init (void) {
 	cvar_cheats = Cvar_Get("sv_cheats", "0", CVAR_SYSTEMINFO);
+	com_overrideCheats = Cvar_Get("com_overrideCheats", "0", CVAR_ARCHIVE | CVAR_GLOBAL); //Lom v24
 
 	Cmd_AddCommand ("print", Cvar_Print_f );
 	Cmd_SetCommandCompletionFunc( "print", Cvar_CompleteCvarName );
