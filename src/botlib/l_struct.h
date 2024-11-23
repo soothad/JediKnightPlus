@@ -56,3 +56,12 @@ int WriteIndent(FILE *fp, int indent);
 int WriteFloat(FILE *fp, float value);
 
 
+//writes a float without trailing zeros
+int WriteFloat(FILE *fp, float value) {
+    char buffer[32];
+    snprintf(buffer, sizeof(buffer), "%.6g", value);
+    if (fputs(buffer, fp) == EOF) {
+        return -1;
+    }
+    return 0;
+}

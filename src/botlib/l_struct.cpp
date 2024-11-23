@@ -21,15 +21,11 @@
 #include "l_utils.h"
 #include "be_interface.h"
 #endif //BOTLIB
-
 #ifdef BSPC
 //include files for usage in the BSP Converter
 #include "../bspc/qbsp.h"
 #include "../bspc/l_log.h"
 #include "../bspc/l_mem.h"
-#include "l_precomp.h"
-#include "l_struct.h"
-
 #define qtrue	true
 #define qfalse	false
 #endif //BSPC
@@ -51,7 +47,6 @@ fielddef_t *FindField(fielddef_t *defs, char *name)
 	return NULL;
 } //end of the function FindField
 //===========================================================================
-//
 // Parameter:				-
 // Returns:					-
 // Changes Globals:		-
@@ -82,7 +77,7 @@ qboolean ReadNumber(source_t *source, fielddef_t *fd, void *p)
 		negative = qtrue;
 		//read the number
 		if (!PC_ExpectAnyToken(source, &token)) return qfalse;
-	} //end if
+	}//end if
 	//check if it is a number
 	if (token.type != TT_NUMBER)
 	{
